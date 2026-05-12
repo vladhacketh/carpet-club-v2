@@ -1,0 +1,189 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  artist: CollectionEntry<'artists'>;
+}
+
+const { artist } = Astro.props;
+const { name, role, image, socials } = artist.data;
+const href = `/artists/${artist.slug}`;
+
+const platforms: Array<[string, string | undefined]> = [
+  ['IG', socials.instagram],
+  ['SC', socials.soundcloud],
+  ['BC', socials.bandcamp],
+  ['RA', socials.ra],
+];
+const linked = platforms.filter(([, url]) => url);
+
+// WebP path: derive from .jpeg fallback
+const webp = image?.replace(/\.(jpe?g|png)$/i, '.webp');
+---
+
+<article class="artist-card">
+  <a href={href} class="artist-card-link" aria-label={`View ${name} profile`}>
+    <span class="visually-hidden">{name}</span>
+  </a>
+
+  {image && (
+    <picture>
+      {webp && webp !== image && <source srcset={webp} type="image/webp" />}
+      <img
+        src={image}
+        alt={name}
+        class="artist-card-img"
+        width="900"
+        height="900"
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  )}
+
+  <div class="artist-overlay">
+    <span class="artist-view-label">View Profile</span>
+    <div class="artist-info">
+      <h3 class="artist-name">{name}</h3>
+      <p class="artist-genre">{role}</p>
+      <div class="artist-links">
+        {linked.map(([label, url]) => (
+          <a href={url} target="_blank" rel="noopener noreferrer" data-platform-link>
+            {label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .artist-card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: theme('colors.bg.card');
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .artist-card:hover,
+  .artist-card:focus-within {
+    transform: scale(1.02);
+    z-index: 3;
+  }
+  .artist-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+  }
+  .artist-card picture,
+  .artist-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .artist-card-img {
+    object-fit: cover;
+    object-position: center 30%;
+    transition: transform 0.5s, filter 0.4s;
+    filter: grayscale(20%);
+  }
+  .artist-card:hover .artist-card-img,
+  .artist-card:focus-within .artist-card-img {
+    transform: scale(1.06);
+    filter: grayscale(0%);
+  }
+  .artist-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.3) 50%, transparent 100%);
+    pointer-events: none;
+  }
+  .artist-view-label {
+    position: absolute;
+    top: 18px; left: 18px;
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: all 0.35s ease 0.05s;
+  }
+  .artist-card:hover .artist-view-label,
+  .artist-card:focus-within .artist-view-label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .artist-name {
+    font-size: clamp(16px, 1.6vw, 22px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+    line-height: 1.1;
+  }
+  .artist-genre {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+  }
+  .artist-links {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s;
+    pointer-events: auto;
+  }
+  .artist-card:hover .artist-links,
+  .artist-card:focus-within .artist-links {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .artist-links a {
+    color: theme('colors.text.muted');
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    background: rgba(10,10,10,0.55);
+    backdrop-filter: blur(4px);
+    transition: all 0.2s;
+    position: relative;
+    z-index: 4;
+  }
+  .artist-links a:hover {
+    border-color: theme('colors.accent.DEFAULT');
+    color: theme('colors.accent.DEFAULT');
+  }
+</style>
+
+<script>
+  // Prevent platform pill clicks from triggering the card-link.
+  document.querySelectorAll<HTMLElement>('[data-platform-link]').forEach((el) => {
+    el.addEventListener('click', (e) => e.stopPropagation());
+  });
+</script>

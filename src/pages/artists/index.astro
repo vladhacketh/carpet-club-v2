@@ -1,0 +1,117 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import ArtistCard from '~/components/ArtistCard.astro';
+import Marquee from '~/components/Marquee.astro';
+import { getCollection } from 'astro:content';
+
+const artists = (await getCollection('artists')).sort((a, b) =>
+  a.data.name.localeCompare(b.data.name),
+);
+---
+
+<BaseLayout
+  title="Artists"
+  description="Resident DJs in the Carpet Club family — Lisbon's Wednesday night residency at Rūmu."
+>
+  <section class="artists-section">
+    <header class="section-header">
+      <p class="section-label">Residency</p>
+      <h1>Artists</h1>
+      <p class="lede">
+        Resident DJs in the Carpet &amp; Snares family. Click any portrait for their full profile,
+        mixes and bookings.
+      </p>
+    </header>
+
+    <div class="artists-grid">
+      {artists.map((artist) => <ArtistCard artist={artist} />)}
+    </div>
+
+    <div class="book-cta">
+      <a
+        href="mailto:kristina.carpetevents@gmail.com?subject=Artist%20Booking%20Inquiry"
+        class="hero-cta"
+        data-drip
+        data-drip-intensity="28"
+      >
+        Book an Artist →
+      </a>
+      <p class="hint">
+        Bookings: <a href="mailto:kristina.carpetevents@gmail.com">kristina.carpetevents@gmail.com</a>
+      </p>
+    </div>
+  </section>
+
+  <Marquee />
+</BaseLayout>
+
+<style>
+  .artists-section {
+    padding: 140px 48px 96px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-header { margin-bottom: 56px; max-width: 720px; }
+  .section-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .lede {
+    color: theme('colors.text.muted');
+    font-size: clamp(15px, 1.3vw, 18px);
+    line-height: 1.6;
+  }
+
+  .artists-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: theme('colors.border');
+  }
+  @media (max-width: 900px) { .artists-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .artists-grid { grid-template-columns: 1fr; } }
+
+  .book-cta {
+    margin-top: 64px;
+    text-align: center;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 36px;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .hero-cta:hover { background: theme('colors.accent.hover'); transform: translateY(-2px); }
+  .hint {
+    margin-top: 16px;
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: theme('colors.text.muted');
+  }
+  .hint a { color: theme('colors.text.muted'); text-decoration: underline; }
+  .hint a:hover { color: theme('colors.accent.DEFAULT'); }
+
+  @media (max-width: 700px) { .artists-section { padding: 100px 24px 64px; } }
+</style>

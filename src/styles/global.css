@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* Keyframes used by raw CSS in components — declared at top level
+   so Tailwind doesn't strip them when the corresponding utilities aren't used. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.7); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%      { opacity: 1; }
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a transparent;
+  }
+
+  body {
+    @apply font-body bg-bg text-text;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Custom cursor hides native one on desktop pointer devices */
+  @media (pointer: fine) {
+    body {
+      cursor: none;
+    }
+    a, button, input, textarea, select {
+      cursor: none;
+    }
+  }
+
+  /* Respect reduced-motion: kill animations entirely */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    #pixelBg, .cursor-dot, .cursor-ring {
+      display: none !important;
+    }
+    body { cursor: auto !important; }
+  }
+
+  ::selection {
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+  }
+
+  /* Focus-visible — visible keyboard focus everywhere */
+  :focus-visible {
+    outline: 2px solid theme('colors.accent.DEFAULT');
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .marquee {
+    @apply overflow-hidden py-3.5 border-y border-border;
+  }
+  .marquee-inner {
+    @apply flex gap-16 w-max;
+    animation: marquee 30s linear infinite;
+  }
+  .marquee-item {
+    @apply font-mono text-[10px] uppercase whitespace-nowrap text-text-muted flex items-center gap-16;
+    letter-spacing: 4px;
+  }
+  .marquee-item::after {
+    content: '◆';
+    color: theme('colors.accent.DEFAULT');
+    font-size: 7px;
+  }
+}

@@ -1,0 +1,283 @@
+---
+import { site } from '~/lib/site';
+
+const year = new Date().getFullYear();
+const social = [
+  { label: 'Instagram', handle: '@carpetclub_', url: site.social.instagram },
+  { label: 'Soundcloud', handle: '/carpetandsnares', url: site.social.soundcloud },
+  { label: 'Bandcamp', handle: 'carpetandsnaresrecords', url: site.social.bandcamp },
+  { label: 'Resident Advisor', handle: '/promoters/55088', url: site.social.ra },
+  { label: 'Shotgun', handle: 'tickets & events', url: site.social.shotgun },
+];
+const nav = [
+  { href: '/about', label: 'About' },
+  { href: '/artists', label: 'Artists' },
+  { href: '/events', label: 'Events' },
+  { href: '/membership', label: 'Membership' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const web3formsKey = site.web3formsKey;
+---
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <a href="/" class="logo">
+        <span class="logo-dot" aria-hidden="true"></span>
+        <span>CARPET CLUB</span>
+      </a>
+      <p class="tagline">
+        Lisbon-based event brand. Weekly residency and curated showcases rooted in electronic music and club culture.
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul role="list">
+        {nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul role="list">
+        {social.map((s) => (
+          <li>
+            <a href={s.url} target="_blank" rel="noopener noreferrer">{s.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Newsletter</h4>
+      <form id="newsletterForm" class="newsletter" novalidate>
+        <input type="hidden" name="access_key" value={web3formsKey} />
+        <input type="hidden" name="subject" value="Newsletter signup — Carpet Club" />
+        <input type="hidden" name="from_name" value="Carpet Club Newsletter" />
+        {/* Honeypot anti-spam — bots fill this, humans don't see it */}
+        <input type="checkbox" name="botcheck" class="botcheck" tabindex="-1" autocomplete="off" />
+
+        <label for="newsletterEmail" class="sr-only">Email address</label>
+        <input
+          type="email"
+          id="newsletterEmail"
+          name="email"
+          required
+          autocomplete="email"
+          placeholder="your@email.com"
+        />
+        <button type="submit">Subscribe</button>
+        <p class="hint" data-status>No spam. Unsubscribe anytime.</p>
+      </form>
+    </div>
+  </div>
+
+  <div class="legal">
+    <span>© {year} Carpet Club</span>
+    <span aria-hidden="true">·</span>
+    <span>Part of the Carpet &amp; Snares ecosystem</span>
+    <span aria-hidden="true">·</span>
+    <span>Rua da Misericórdia 14, Loja 28, Lisboa</span>
+  </div>
+</footer>
+
+<style>
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid theme('colors.border');
+    padding: 64px 48px 24px;
+    background: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(8px);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-col h4 {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 18px;
+  }
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .footer-col a {
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: theme('colors.accent.DEFAULT'); }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: theme('fontFamily.mono');
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    margin-bottom: 16px;
+  }
+  .logo-dot {
+    width: 7px;
+    height: 7px;
+    background: theme('colors.accent.DEFAULT');
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  .tagline {
+    color: theme('colors.text.muted');
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 320px;
+  }
+
+  .newsletter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .newsletter input {
+    background: transparent;
+    border: 1px solid theme('colors.border');
+    border-radius: 2px;
+    padding: 12px 14px;
+    color: theme('colors.text.DEFAULT');
+    font-family: theme('fontFamily.body');
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .newsletter input:focus {
+    outline: none;
+    border-color: theme('colors.accent.DEFAULT');
+  }
+  .newsletter button {
+    background: theme('colors.accent.DEFAULT');
+    border: none;
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 13px 16px;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .newsletter button:hover { background: theme('colors.accent.hover'); }
+  .newsletter .hint {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    color: theme('colors.text.muted');
+    margin-top: 4px;
+  }
+
+  .legal {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid theme('colors.border');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    text-align: center;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .botcheck {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .hint[data-status="ok"] { color: theme('colors.accent.DEFAULT'); }
+  .hint[data-status="err"] { color: #ff6b6b; }
+
+  @media (max-width: 900px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    footer { padding: 48px 24px 24px; }
+  }
+  @media (max-width: 600px) {
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('newsletterForm') as HTMLFormElement | null;
+  const hint = form?.querySelector('[data-status]') as HTMLElement | null;
+  const btn = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+
+  function setStatus(msg: string, kind: '' | 'ok' | 'err') {
+    if (!hint) return;
+    hint.textContent = msg;
+    hint.dataset.status = kind;
+  }
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const accessKey = data.get('access_key');
+      const botcheck = data.get('botcheck');
+      if (botcheck) return; // honeypot tripped
+
+      if (!accessKey) {
+        setStatus('Newsletter not configured yet (missing API key).', 'err');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      setStatus('Subscribing...', '');
+
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: data,
+        });
+        const json = await res.json();
+        if (json.success) {
+          setStatus('You\u2019re on the list. See you Wednesday.', 'ok');
+          form.reset();
+        } else {
+          setStatus('Couldn\u2019t subscribe. Try again or email us.', 'err');
+        }
+      } catch {
+        setStatus('Network error. Try again.', 'err');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  }
+</script>

@@ -1,0 +1,80 @@
+---
+// Animated pixel mosaic background.
+// Ported from v222. Respects prefers-reduced-motion via CSS.
+---
+
+<canvas id="pixelBg" aria-hidden="true"></canvas>
+
+<style>
+  #pixelBg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const canvas = document.getElementById('pixelBg') as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const PX = 22;
+    let cols = 0, rows = 0;
+    type Cell = {
+      base: number; current: number; target: number;
+      speed: number; glow: number; glowTarget: number;
+    };
+    let grid: Cell[] = [];
+
+    function resize() {
+      if (!canvas || !ctx) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.ceil(canvas.width / PX) + 1;
+      rows = Math.ceil(canvas.height / PX) + 1;
+      grid = [];
+      for (let i = 0; i < cols * rows; i++) {
+        const base = 8 + Math.random() * 18;
+        grid.push({
+          base, current: base, target: base,
+          speed: 0.3 + Math.random() * 0.7,
+          glow: 0, glowTarget: 0,
+        });
+      }
+    }
+
+    function animate() {
+      if (!ctx) return;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          const c = grid[y * cols + x];
+          if (Math.random() < 0.004) {
+            c.target = Math.max(4, Math.min(35, c.base + (Math.random() - 0.5) * 16));
+          }
+          if (Math.random() < 0.0005) c.glowTarget = 0.12 + Math.random() * 0.2;
+          c.current += (c.target - c.current) * 0.02 * c.speed;
+          c.glow += (c.glowTarget - c.glow) * 0.03;
+          if (c.glowTarget > 0) {
+            c.glowTarget *= 0.994;
+            if (c.glowTarget < 0.01) c.glowTarget = 0;
+          }
+          const v = Math.round(c.current);
+          ctx.fillStyle = `rgb(${v + Math.round(c.glow * 160)},${v + Math.round(c.glow * 15)},${v + Math.round(c.glow * 50)})`;
+          ctx.fillRect(x * PX, y * PX, PX, PX);
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize, { passive: true });
+    resize();
+    animate();
+  })();
+</script>

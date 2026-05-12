@@ -1,0 +1,270 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Marquee from '~/components/Marquee.astro';
+
+export async function getStaticPaths() {
+  const artists = await getCollection('artists');
+  return artists.map((artist) => ({
+    params: { slug: artist.slug },
+    props: { artist },
+  }));
+}
+
+interface Props {
+  artist: CollectionEntry<'artists'>;
+}
+const { artist } = Astro.props;
+const { name, role, image, socials } = artist.data;
+const { Content } = await artist.render();
+
+const webp = image?.replace(/\.(jpe?g|png)$/i, '.webp');
+
+const platforms: Array<{ label: string; url?: string }> = [
+  { label: 'Instagram', url: socials.instagram },
+  { label: 'Soundcloud', url: socials.soundcloud },
+  { label: 'Bandcamp', url: socials.bandcamp },
+  { label: 'Resident Advisor', url: socials.ra },
+];
+const linked = platforms.filter((p) => p.url);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name,
+  jobTitle: role,
+  ...(image && { image: new URL(image, Astro.site).toString() }),
+  sameAs: linked.map((p) => p.url),
+  affiliation: {
+    '@type': 'Organization',
+    name: 'Carpet Club',
+    url: 'https://carpetclub.example',
+  },
+};
+---
+
+<BaseLayout
+  title={name}
+  description={`${name} — ${role} at Carpet Club, Lisbon's Wednesday night residency at Rūmu.`}
+  image={image}
+  type="article"
+  schema={schema}
+>
+  <article class="artist-detail">
+    <a href="/artists" class="back-link">← All Artists</a>
+
+    <div class="artist-hero">
+      {image && (
+        <picture class="artist-portrait">
+          {webp && webp !== image && <source srcset={webp} type="image/webp" />}
+          <img src={image} alt={name} width="900" height="900" fetchpriority="high" decoding="async" />
+        </picture>
+      )}
+
+      <div class="artist-meta">
+        <p class="role">{role}</p>
+        <h1>{name}</h1>
+
+        <div class="bio">
+          <Content />
+        </div>
+
+        {linked.length > 0 && (
+          <ul class="socials" role="list">
+            {linked.map((p) => (
+              <li>
+                <a href={p.url} target="_blank" rel="noopener noreferrer">
+                  <span>{p.label}</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <a
+          href={`mailto:kristina.carpetevents@gmail.com?subject=Booking%20Inquiry:%20${encodeURIComponent(name)}`}
+          class="book-btn"
+          data-drip
+          data-drip-intensity="28"
+        >
+          Book {name} →
+        </a>
+      </div>
+    </div>
+
+    <section class="mix-section" aria-labelledby="mix-heading">
+      <p class="section-label">Latest Mix</p>
+      <h2 id="mix-heading">Sounds from {name}</h2>
+      <div class="mix-placeholder">
+        <p>
+          {socials.soundcloud ? (
+            <>
+              SoundCloud embed slot. Paste a track URL into <code>src/pages/artists/[slug].astro</code>,
+              or visit <a href={socials.soundcloud} target="_blank" rel="noopener noreferrer">{name}'s SoundCloud</a> directly.
+            </>
+          ) : (
+            <>No SoundCloud profile linked yet. Add one to <code>src/content/artists/{artist.slug}.md</code>.</>
+          )}
+        </p>
+      </div>
+    </section>
+  </article>
+
+  <Marquee />
+</BaseLayout>
+
+<style>
+  .artist-detail {
+    padding: 140px 48px 96px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    color: theme('colors.text.muted');
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    margin-bottom: 48px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: theme('colors.accent.DEFAULT'); }
+
+  .artist-hero {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 64px;
+    align-items: start;
+    margin-bottom: 96px;
+  }
+  .artist-portrait {
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: theme('colors.bg.card');
+  }
+  .artist-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+  }
+
+  .role {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 16px;
+  }
+  .artist-meta h1 {
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 32px;
+  }
+  .bio {
+    font-size: 17px;
+    line-height: 1.7;
+    color: theme('colors.text.DEFAULT');
+    margin-bottom: 40px;
+  }
+  .bio :global(p) { margin-bottom: 16px; }
+
+  .socials {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-top: 24px;
+    border-top: 1px solid theme('colors.border');
+  }
+  .socials a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    font-family: theme('fontFamily.mono');
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    padding: 4px 0;
+  }
+  .socials a:hover { color: theme('colors.accent.DEFAULT'); transform: translateX(4px); }
+  .socials a:hover svg { transform: translate(2px, -2px); }
+  .socials svg { transition: transform 0.2s; }
+
+  .book-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 36px;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .book-btn:hover { background: theme('colors.accent.hover'); transform: translateY(-2px); }
+
+  .mix-section {
+    border-top: 1px solid theme('colors.border');
+    padding-top: 64px;
+  }
+  .section-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 8px;
+  }
+  .mix-section h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 32px;
+  }
+  .mix-placeholder {
+    background: theme('colors.bg.card');
+    border: 1px dashed theme('colors.border');
+    padding: 48px 32px;
+    color: theme('colors.text.muted');
+    line-height: 1.6;
+    border-radius: 2px;
+  }
+  .mix-placeholder a {
+    color: theme('colors.accent.DEFAULT');
+    text-decoration: underline;
+  }
+  .mix-placeholder code {
+    font-family: theme('fontFamily.mono');
+    font-size: 12px;
+    color: theme('colors.accent.DEFAULT');
+    background: rgba(255, 60, 120, 0.08);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 800px) {
+    .artist-detail { padding: 100px 24px 64px; }
+    .artist-hero { grid-template-columns: 1fr; gap: 32px; }
+    .artist-portrait { max-width: 380px; }
+  }
+</style>

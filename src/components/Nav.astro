@@ -1,0 +1,189 @@
+---
+const { pathname } = Astro.url;
+const links = [
+  { href: '/about', label: 'About' },
+  { href: '/artists', label: 'Artists' },
+  { href: '/events', label: 'Events' },
+  { href: '/membership', label: 'Membership' },
+  { href: '/contact', label: 'Contact' },
+];
+const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+---
+
+<nav aria-label="Primary">
+  <a href="/" class="logo" aria-label="Carpet Club — home">
+    <span class="logo-dot" aria-hidden="true"></span>
+    <span>CARPET CLUB</span>
+  </a>
+
+  <ul class="nav-links" role="list">
+    {links.map(({ href, label }) => (
+      <li>
+        <a href={href} class:list={[{ active: isActive(href) }]}>
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  <button
+    class="menu-toggle"
+    id="menuToggle"
+    aria-label="Toggle navigation menu"
+    aria-expanded="false"
+    aria-controls="mobileNav"
+  >
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-nav" id="mobileNav" hidden>
+  <ul role="list">
+    {links.map(({ href, label }) => (
+      <li>
+        <a href={href} class:list={[{ active: isActive(href) }]}>
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 20px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: rgba(10, 10, 10, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  .logo {
+    font-family: theme('fontFamily.mono');
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-dot {
+    width: 7px;
+    height: 7px;
+    background: theme('colors.accent.DEFAULT');
+    border-radius: 50%;
+    animation: pulse-dot 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+    padding: 4px 0;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 1px;
+    background: theme('colors.accent.DEFAULT');
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s;
+  }
+  .nav-links a:hover::after,
+  .nav-links a.active::after {
+    transform: scaleX(1);
+  }
+  .nav-links a.active { color: theme('colors.accent.DEFAULT'); }
+
+  .menu-toggle {
+    background: none;
+    border: 1px solid theme('colors.border');
+    padding: 10px 12px;
+    flex-direction: column;
+    gap: 5px;
+    border-radius: 2px;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    display: none;
+  }
+  .menu-toggle span {
+    display: block;
+    width: 20px;
+    height: 1px;
+    background: theme('colors.text.DEFAULT');
+    transition: all 0.3s;
+  }
+
+  .mobile-nav {
+    position: fixed;
+    inset: 70px 0 0 0;
+    background: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(24px);
+    z-index: 999;
+    padding: 48px 24px;
+    overflow-y: auto;
+  }
+  .mobile-nav[hidden] { display: none !important; }
+  .mobile-nav ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .mobile-nav a {
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    font-family: theme('fontFamily.mono');
+    font-size: 24px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: block;
+    padding: 16px 0;
+    border-bottom: 1px solid theme('colors.border');
+  }
+  .mobile-nav a.active { color: theme('colors.accent.DEFAULT'); }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .menu-toggle { display: flex; }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('menuToggle');
+  const mobileNav = document.getElementById('mobileNav');
+  if (toggle && mobileNav) {
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      if (expanded) {
+        mobileNav.setAttribute('hidden', '');
+      } else {
+        mobileNav.removeAttribute('hidden');
+      }
+    });
+  }
+</script>

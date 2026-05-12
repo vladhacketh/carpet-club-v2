@@ -1,0 +1,19 @@
+---
+const items = [
+  'Global rug dealers',
+  'Lisbon',
+  'Carpet & Snares',
+  'Carpet Club',
+  'ROOM',
+];
+// Duplicate for seamless loop
+const all = [...items, ...items];
+---
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-inner">
+    {all.map((text) => (
+      <span class="marquee-item">{text}</span>
+    ))}
+  </div>
+</div>

@@ -1,0 +1,86 @@
+---
+// Custom cursor: 6px pink dot + 32px ring with magnetic lag.
+// Only renders on devices with precise pointer (mouse).
+// Ported from v222.
+---
+
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+
+<style>
+  .cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: theme('colors.accent.DEFAULT');
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transition: transform 0.1s;
+    left: -20px;
+    top: -20px;
+  }
+  .cursor-ring {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 60, 120, 0.6);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transition: width 0.3s, height 0.3s;
+    left: -40px;
+    top: -40px;
+  }
+  .cursor-ring.hover {
+    width: 52px;
+    height: 52px;
+  }
+  @media (pointer: coarse) {
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+</style>
+
+<script>
+  (function () {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    if (!dot || !ring) return;
+
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.left = mouseX - 3 + 'px';
+      dot.style.top = mouseY - 3 + 'px';
+    }, { passive: true });
+
+    // Hover expand on interactive elements
+    const interactiveSelector = 'a, button, [data-cursor-hover], input, textarea, select, .artist-card';
+    document.addEventListener('mouseover', (e) => {
+      if ((e.target as Element)?.closest?.(interactiveSelector)) {
+        ring.classList.add('hover');
+      }
+    });
+    document.addEventListener('mouseout', (e) => {
+      if ((e.target as Element)?.closest?.(interactiveSelector)) {
+        ring.classList.remove('hover');
+      }
+    });
+
+    function animRing() {
+      if (!ring) return;
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      ring.style.left = ringX - 16 + 'px';
+      ring.style.top = ringY - 16 + 'px';
+      requestAnimationFrame(animRing);
+    }
+    animRing();
+  })();
+</script>

@@ -1,0 +1,328 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Marquee from '~/components/Marquee.astro';
+import { site } from '~/lib/site';
+
+const platforms = [
+  { label: 'Instagram', handle: '@carpetclub_', url: site.social.instagram },
+  { label: 'Soundcloud', handle: '/carpetandsnares', url: site.social.soundcloud },
+  { label: 'Bandcamp', handle: 'carpetandsnaresrecords', url: site.social.bandcamp },
+  { label: 'Resident Advisor', handle: '/promoters/55088', url: site.social.ra },
+  { label: 'Shotgun', handle: 'tickets & events', url: site.social.shotgun },
+];
+const web3formsKey = site.web3formsKey;
+---
+
+<BaseLayout
+  title="Contact"
+  description="Bookings, press, and general inquiries — Carpet Club, Lisbon."
+>
+  <section class="contact-section">
+    <header class="contact-header" data-drip data-drip-intensity="32">
+      <span class="contact-mark-line">Carpet</span>
+      <span class="contact-mark-line">Club</span>
+    </header>
+
+    <div class="contact-grid">
+      <div class="contact-col">
+        <h2 class="col-label">Connect</h2>
+        <ul role="list" class="platform-list">
+          {platforms.map((p) => (
+            <li>
+              <a href={p.url} target="_blank" rel="noopener noreferrer" class="platform-row">
+                <span class="platform-name">{p.label}</span>
+                <span class="platform-handle">{p.handle}</span>
+                <span class="platform-arrow" aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="address-block">
+          <p class="col-sub-label">Record Store &amp; Office</p>
+          <p class="address">
+            Carpet &amp; Snares Records<br />
+            Rua da Misericórdia, 14<br />
+            Piso S/L, Loja 28<br />
+            1200-273 Lisboa, Portugal
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-col">
+        <h2 class="col-label">Bookings &amp; Events</h2>
+        <a href="mailto:kristina.carpetevents@gmail.com" class="big-email">
+          kristina.carpetevents@gmail.com
+        </a>
+
+        <form id="contactForm" class="contact-form" novalidate>
+          <p class="col-sub-label">Send a Message</p>
+
+          <input type="hidden" name="access_key" value={web3formsKey} />
+          <input type="hidden" name="from_name" value="Carpet Club — Contact form" />
+          {/* Honeypot anti-spam */}
+          <input type="checkbox" name="botcheck" class="botcheck" tabindex="-1" autocomplete="off" />
+
+          <div class="field">
+            <label for="cName">Name</label>
+            <input id="cName" name="name" type="text" required autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="cEmail">Email</label>
+            <input id="cEmail" name="email" type="email" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="cSubject">Subject</label>
+            <input id="cSubject" name="subject" type="text" />
+          </div>
+          <div class="field">
+            <label for="cMessage">Message</label>
+            <textarea id="cMessage" name="message" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Send Message</button>
+          <p class="form-status" data-status></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <Marquee />
+</BaseLayout>
+
+<style>
+  .contact-section {
+    padding: 140px 48px 96px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .contact-header {
+    margin-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    cursor: pointer;
+  }
+  .contact-mark-line {
+    font-size: clamp(56px, 14vw, 168px);
+    font-weight: 700;
+    line-height: 0.88;
+    letter-spacing: -4px;
+    color: theme('colors.text.DEFAULT');
+  }
+  .contact-mark-line:nth-child(2) {
+    color: transparent;
+    -webkit-text-stroke: 1.5px theme('colors.text.muted');
+  }
+  .contact-header:hover .contact-mark-line,
+  .contact-header:focus-within .contact-mark-line {
+    filter: url(#drip);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .col-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 28px;
+  }
+  .col-sub-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    margin-bottom: 16px;
+  }
+
+  /* Platform list */
+  .platform-list {
+    list-style: none;
+    border-top: 1px solid theme('colors.border');
+    margin-bottom: 48px;
+  }
+  .platform-list li { border-bottom: 1px solid theme('colors.border'); }
+  .platform-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 20px;
+    padding: 20px 0;
+    text-decoration: none;
+    color: theme('colors.text.DEFAULT');
+    transition: all 0.2s;
+  }
+  .platform-row:hover {
+    color: theme('colors.accent.DEFAULT');
+    transform: translateX(8px);
+  }
+  .platform-row:hover .platform-handle { color: theme('colors.text.DEFAULT'); }
+  .platform-row:hover .platform-arrow { transform: translate(4px, -4px); }
+  .platform-name {
+    font-size: clamp(18px, 1.8vw, 24px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .platform-handle {
+    font-family: theme('fontFamily.mono');
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: theme('colors.text.muted');
+    transition: color 0.2s;
+  }
+  .platform-arrow {
+    font-family: theme('fontFamily.mono');
+    font-size: 18px;
+    color: theme('colors.accent.DEFAULT');
+    transition: transform 0.2s;
+  }
+
+  .address {
+    font-family: theme('fontFamily.mono');
+    font-size: 13px;
+    letter-spacing: 1px;
+    line-height: 1.8;
+    color: theme('colors.text.muted');
+  }
+
+  /* Email */
+  .big-email {
+    display: block;
+    font-size: clamp(20px, 2.5vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    margin-bottom: 48px;
+    word-break: break-word;
+    transition: color 0.2s;
+  }
+  .big-email:hover { color: theme('colors.accent.DEFAULT'); }
+
+  /* Form */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+  }
+  .field input,
+  .field textarea {
+    background: transparent;
+    border: 1px solid theme('colors.border');
+    border-radius: 2px;
+    padding: 12px 14px;
+    color: theme('colors.text.DEFAULT');
+    font-family: theme('fontFamily.body');
+    font-size: 14px;
+    transition: border-color 0.2s;
+  }
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: theme('colors.accent.DEFAULT');
+  }
+  .field textarea { resize: vertical; min-height: 100px; }
+  .submit-btn {
+    align-self: flex-start;
+    background: theme('colors.accent.DEFAULT');
+    border: none;
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 15px 36px;
+    border-radius: 2px;
+    transition: background 0.2s;
+    margin-top: 8px;
+  }
+  .submit-btn:hover { background: theme('colors.accent.hover'); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .botcheck {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .form-status {
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: theme('colors.text.muted');
+    margin-top: 8px;
+    min-height: 18px;
+  }
+  .form-status[data-status="ok"] { color: theme('colors.accent.DEFAULT'); }
+  .form-status[data-status="err"] { color: #ff6b6b; }
+
+  @media (max-width: 800px) {
+    .contact-section { padding: 100px 24px 64px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+    .platform-row { grid-template-columns: 1fr auto; }
+    .platform-handle { display: none; }
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contactForm') as HTMLFormElement | null;
+  const status = form?.querySelector('[data-status]') as HTMLElement | null;
+  const btn = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+
+  function setStatus(msg: string, kind: '' | 'ok' | 'err') {
+    if (!status) return;
+    status.textContent = msg;
+    status.dataset.status = kind;
+  }
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const accessKey = data.get('access_key');
+      const botcheck = data.get('botcheck');
+      if (botcheck) return; // honeypot tripped
+
+      if (!accessKey) {
+        setStatus('Form not configured yet — missing access key.', 'err');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      setStatus('Sending...', '');
+
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: data,
+        });
+        const json = await res.json();
+        if (json.success) {
+          setStatus('Message sent. We\u2019ll be in touch.', 'ok');
+          form.reset();
+        } else {
+          setStatus('Couldn\u2019t send. Try again or email us directly.', 'err');
+        }
+      } catch {
+        setStatus('Network error. Try again.', 'err');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    });
+  }
+</script>

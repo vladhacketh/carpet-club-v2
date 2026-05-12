@@ -1,0 +1,394 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Marquee from '~/components/Marquee.astro';
+import { getCollection } from 'astro:content';
+
+const upcoming = (await getCollection('events', ({ data }) => data.status === 'upcoming'))
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
+  .slice(0, 2);
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).toUpperCase();
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Carpet Club',
+  alternateName: 'Carpet & Snares',
+  description: 'Lisbon-based event brand. Weekly residency and curated showcases rooted in electronic music and club culture.',
+  url: 'https://carpetclub.example',
+  foundingDate: '2014',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Rua da Misericórdia 14, Loja 28',
+    addressLocality: 'Lisboa',
+    postalCode: '1200-273',
+    addressCountry: 'PT',
+  },
+  sameAs: [
+    'https://instagram.com/carpetclub_/',
+    'https://soundcloud.com/carpetandsnares',
+    'https://ra.co/promoters/55088',
+    'https://shotgun.live/en/venues/carpet-snares-records',
+  ],
+};
+---
+
+<BaseLayout title="Carpet Club" schema={schema}>
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-label">
+        <span class="line" aria-hidden="true"></span>
+        Lisbon · Est. 2014
+        <span class="line" aria-hidden="true"></span>
+      </p>
+
+      <h1 class="visually-hidden">Carpet Club</h1>
+
+      <picture class="hero-logo-wrap" data-drip data-drip-intensity="40">
+        <source srcset="/assets/carpet-hero.webp" type="image/webp" />
+        <img
+          src="/assets/carpet-hero.png"
+          alt="Carpet"
+          class="hero-logo"
+          width="1400"
+          height="989"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+
+      <p class="hero-lede">
+        Weekly events and curated showcases rooted in electronic music and club culture.
+      </p>
+
+      <a href="/events" class="hero-cta" data-drip data-drip-intensity="28">
+        View Upcoming Events
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M5 12h14m-7-7l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+
+      <div class="hero-meta">
+        <span>Wednesday Residency</span>
+        <span aria-hidden="true">·</span>
+        <span>Rūmu, Lisbon</span>
+        <span aria-hidden="true">·</span>
+        <span>Tickets on Shotgun</span>
+      </div>
+    </div>
+  </section>
+
+  {upcoming.length > 0 && (
+    <section class="content-section" aria-labelledby="now-next-heading">
+      <header class="section-header">
+        <p class="section-label">Now &amp; Next</p>
+        <h2 id="now-next-heading">Upcoming Wednesdays</h2>
+      </header>
+      <div class="event-cards">
+        {upcoming.map((e) => (
+          <article class="event-card">
+            <time datetime={e.data.date.toISOString()} class="event-date">
+              {fmtDate(e.data.date)}
+            </time>
+            <h3>{e.data.title}</h3>
+            <p class="lineup">{e.data.lineup.join(' · ')}</p>
+            <p class="venue">{e.data.venue}, Lisbon</p>
+            {e.data.shotgun && (
+              <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
+                Tickets on Shotgun →
+              </a>
+            )}
+          </article>
+        ))}
+      </div>
+      <a href="/events" class="see-all">See full schedule →</a>
+    </section>
+  )}
+
+  <section class="content-section mix-section" aria-labelledby="mix-heading">
+    <header class="section-header">
+      <p class="section-label">Latest Mix</p>
+      <h2 id="mix-heading">From the Floor</h2>
+    </header>
+    <div class="mix-embed">
+      <div class="mix-placeholder">
+        <p class="mix-placeholder-text">
+          SoundCloud embed slot — paste a track URL into <code>src/pages/index.astro</code> to wire it up.
+        </p>
+        <a href="https://soundcloud.com/carpetandsnares" target="_blank" rel="noopener noreferrer" class="see-all">
+          Listen on Soundcloud →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section photo-section" aria-labelledby="photos-heading">
+    <header class="section-header">
+      <p class="section-label">Photos from the Floor</p>
+      <h2 id="photos-heading">Recent Wednesdays</h2>
+    </header>
+    <div class="photo-strip">
+      {[1, 2, 3, 4].map((i) => (
+        <div class="photo-cell" aria-hidden="true">
+          <span>Photo {i}</span>
+        </div>
+      ))}
+    </div>
+    <a href="https://instagram.com/carpetclub_/" target="_blank" rel="noopener noreferrer" class="see-all">
+      More on Instagram →
+    </a>
+  </section>
+
+  <Marquee />
+</BaseLayout>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .hero {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 120px 24px 80px;
+  }
+  .hero-content {
+    text-align: center;
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fade-up 0.8s ease forwards 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-label .line {
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: theme('colors.accent.DEFAULT');
+    opacity: 0.4;
+  }
+
+  .hero-logo-wrap {
+    display: block;
+    cursor: pointer;
+    opacity: 0;
+    animation: fade-up 0.9s ease forwards 0.4s;
+  }
+  .hero-logo {
+    width: clamp(280px, 50vw, 640px);
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    transition: filter 0.1s;
+  }
+  .hero-logo-wrap:hover .hero-logo,
+  .hero-logo-wrap:focus-within .hero-logo {
+    filter: url(#drip);
+  }
+
+  .hero-lede {
+    max-width: 600px;
+    margin: 32px auto 36px;
+    color: theme('colors.text.muted');
+    font-size: clamp(16px, 1.4vw, 19px);
+    line-height: 1.6;
+    opacity: 0;
+    animation: fade-up 0.8s ease forwards 0.6s;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 36px;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+    opacity: 0;
+    animation: fade-up 0.8s ease forwards 1s;
+  }
+  .hero-cta:hover {
+    background: theme('colors.accent.hover');
+    transform: translateY(-2px);
+  }
+  .hero-cta:hover svg { transform: translateX(4px); }
+  .hero-cta svg { transition: transform 0.2s; }
+
+  .hero-meta {
+    margin-top: 48px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    opacity: 0;
+    animation: fade-up 0.8s ease forwards 1.2s;
+  }
+
+  .content-section {
+    padding: 80px 48px 96px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-header { margin-bottom: 40px; }
+  .section-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 8px;
+  }
+  .content-section h2 {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+
+  .event-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .event-card {
+    background: theme('colors.bg.card');
+    border: 1px solid theme('colors.border');
+    padding: 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .event-card:hover {
+    border-color: theme('colors.accent.DEFAULT');
+    transform: translateY(-2px);
+  }
+  .event-date {
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: theme('colors.accent.DEFAULT');
+    display: block;
+    margin-bottom: 16px;
+  }
+  .event-card h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .lineup {
+    color: theme('colors.text.muted');
+    margin-bottom: 4px;
+  }
+  .venue {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    margin-bottom: 20px;
+  }
+  .event-cta {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: theme('colors.accent.DEFAULT');
+    transition: color 0.2s;
+  }
+  .event-cta:hover { color: theme('colors.accent.hover'); }
+
+  .see-all {
+    color: theme('colors.text.muted');
+    text-decoration: none;
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    display: inline-block;
+    margin-top: 24px;
+  }
+  .see-all:hover { color: theme('colors.accent.DEFAULT'); }
+
+  .mix-section { padding-top: 24px; }
+  .mix-embed { margin-bottom: 8px; }
+  .mix-placeholder {
+    background: theme('colors.bg.card');
+    border: 1px dashed theme('colors.border');
+    padding: 48px 32px;
+    text-align: center;
+    border-radius: 2px;
+  }
+  .mix-placeholder-text {
+    color: theme('colors.text.muted');
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .mix-placeholder code {
+    font-family: theme('fontFamily.mono');
+    font-size: 12px;
+    color: theme('colors.accent.DEFAULT');
+    background: rgba(255, 60, 120, 0.08);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+
+  .photo-section { padding-top: 24px; padding-bottom: 64px; }
+  .photo-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .photo-cell {
+    aspect-ratio: 1/1;
+    background: theme('colors.bg.card');
+    border: 1px dashed theme('colors.border');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: theme('colors.text.muted');
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  @media (max-width: 700px) {
+    .photo-strip { grid-template-columns: repeat(2, 1fr); }
+    .content-section { padding: 56px 24px 64px; }
+    .hero { padding: 100px 16px 60px; }
+  }
+</style>

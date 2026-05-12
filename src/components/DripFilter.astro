@@ -1,0 +1,87 @@
+---
+// Global SVG filter for the drip/melt effect.
+// Renders once into the page. Animate via the `[data-drip]` API
+// on any element — controlled by the imported drip.ts client script.
+---
+
+<svg
+  width="0"
+  height="0"
+  style="position:absolute;width:0;height:0;overflow:hidden"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <filter id="drip" x="-20%" y="-20%" width="140%" height="160%" color-interpolation-filters="sRGB">
+      <feTurbulence
+        id="dripTurb"
+        type="turbulence"
+        baseFrequency="0.01 0.06"
+        numOctaves="3"
+        seed="2"
+        result="noise"
+      />
+      <feDisplacementMap
+        id="dripDisp"
+        in="SourceGraphic"
+        in2="noise"
+        scale="0"
+        xChannelSelector="R"
+        yChannelSelector="G"
+        result="displaced"
+      />
+      <feComposite in="displaced" in2="SourceGraphic" operator="over" />
+    </filter>
+  </defs>
+</svg>
+
+<script>
+  // Drip animation: smooth lerp on feDisplacementMap[scale].
+  // Any element with [data-drip] gains the filter on hover.
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const disp = document.getElementById('dripDisp');
+    if (!disp) return;
+
+    let raf: number | null = null;
+    let current = 0;
+    let target = 0;
+
+    function tick() {
+      current += (target - current) * 0.08;
+      disp!.setAttribute('scale', current.toFixed(2));
+      if (Math.abs(current - target) > 0.3 || target > 0) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        current = 0;
+        disp!.setAttribute('scale', '0');
+        raf = null;
+      }
+    }
+
+    function activate(intensity: number) {
+      target = intensity;
+      if (raf === null) raf = requestAnimationFrame(tick);
+    }
+    function deactivate() {
+      target = 0;
+    }
+
+    function bind() {
+      document.querySelectorAll<HTMLElement>('[data-drip]').forEach((el) => {
+        if (el.dataset.dripBound) return;
+        el.dataset.dripBound = '1';
+        const intensity = Number(el.dataset.dripIntensity) || 40;
+        el.addEventListener('mouseenter', () => activate(intensity));
+        el.addEventListener('mouseleave', deactivate);
+        el.addEventListener('focusin', () => activate(intensity));
+        el.addEventListener('focusout', deactivate);
+      });
+    }
+
+    bind();
+    // Re-bind if content changes (e.g., view transitions in the future)
+    const obs = new MutationObserver(bind);
+    obs.observe(document.body, { childList: true, subtree: true });
+  })();
+</script>

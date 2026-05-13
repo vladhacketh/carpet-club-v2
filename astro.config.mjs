@@ -5,6 +5,9 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://carpetclub.lisbon',
+  redirects: {
+    '/events': '/events/room',
+  },
   integrations: [
     tailwind({ applyBaseStyles: false }),
     sitemap(),

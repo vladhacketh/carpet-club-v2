@@ -1,0 +1,278 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Marquee from '~/components/Marquee.astro';
+import EventsTabs from '~/components/EventsTabs.astro';
+import { getCollection } from 'astro:content';
+
+const all = await getCollection('events');
+const upcoming = all
+  .filter((e) => e.data.status === 'upcoming')
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+
+const fmtDateLong = (d: Date) =>
+  d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit' }).toUpperCase();
+
+const SHOTGUN_URL = 'https://shotgun.live/en/venues/carpet-snares-records';
+const INSTAGRAM_URL = 'https://instagram.com/carpetclub_/';
+
+const FLOOR_VIDEO_URL = 'https://www.youtube.com/watch?v=Hn9YnK96Ji8&t=4s';
+const ytMatch = FLOOR_VIDEO_URL.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
+const ytId = ytMatch?.[1];
+const ytStart = FLOOR_VIDEO_URL.match(/[?&]t=(\d+)/)?.[1];
+const floorEmbed = ytId
+  ? `https://www.youtube-nocookie.com/embed/${ytId}${ytStart ? `?start=${ytStart}` : ''}`
+  : null;
+
+const events_schema = {
+  '@context': 'https://schema.org',
+  '@graph': upcoming.map((e) => ({
+    '@type': 'Event',
+    name: e.data.title,
+    startDate: e.data.date.toISOString(),
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      name: e.data.venue,
+      address: { '@type': 'PostalAddress', addressLocality: 'Lisbon', addressCountry: 'PT' },
+    },
+    performer: e.data.lineup.map((name) => ({ '@type': 'PerformingGroup', name })),
+    organizer: { '@type': 'Organization', name: 'Carpet Club', url: 'https://carpetclub.lisbon' },
+    ...(e.data.shotgun && { offers: { '@type': 'Offer', url: e.data.shotgun, availability: 'https://schema.org/InStock' } }),
+  })),
+};
+---
+
+<BaseLayout
+  title="Room at Rūmu"
+  description="Every Wednesday at Rūmu — a midweek ritual of carefully curated underground music. Rotating lineups, label showcases, and long sets."
+  schema={events_schema}
+>
+  <section class="events-section">
+    <EventsTabs active="room" />
+
+    <header class="hero">
+      <p class="section-label">Weekly Residency</p>
+      <h1>Room at Rūmu</h1>
+      <p class="lede">
+        Every Wednesday at Rūmu — a midweek ritual of carefully curated underground music.
+        No compromise on sound, no compromise on selection. Rotating lineups, label showcases,
+        and long sets.
+      </p>
+      <p class="address">Rua Nova da Trindade 5G, Lisbon · Doors 22:00</p>
+      <div class="hero-cta-row">
+        <a href={SHOTGUN_URL} target="_blank" rel="noopener noreferrer" class="hero-cta">
+          Tickets on Shotgun →
+        </a>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="hero-cta secondary">
+          Instagram →
+        </a>
+      </div>
+    </header>
+
+    {upcoming.length > 0 && (
+      <div class="block">
+        <h2 class="block-title">Upcoming Wednesdays</h2>
+        <div class="event-grid">
+          {upcoming.map((e) => (
+            <article class="event-card">
+              <time datetime={e.data.date.toISOString()} class="event-date">
+                {fmtDateLong(e.data.date)}
+              </time>
+              <h3>{e.data.title}</h3>
+              <p class="lineup">{e.data.lineup.join(' · ')}</p>
+              <p class="venue">{e.data.venue}, Lisbon</p>
+              {e.data.shotgun && (
+                <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
+                  Tickets on Shotgun →
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {floorEmbed && (
+      <section class="floor-section" aria-labelledby="floor-heading">
+        <h2 id="floor-heading" class="block-title">From the Floor</h2>
+        <div class="mix-embed">
+          <div class="yt-wrap">
+            <iframe
+              src={floorEmbed}
+              title="From the Floor"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <a href={FLOOR_VIDEO_URL} target="_blank" rel="noopener noreferrer" class="see-all">
+            Watch on YouTube →
+          </a>
+        </div>
+      </section>
+    )}
+  </section>
+
+  <Marquee />
+</BaseLayout>
+
+<style>
+  .events-section {
+    padding: 140px 48px 96px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hero { margin-bottom: 80px; max-width: 760px; }
+  .section-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .lede {
+    color: theme('colors.text.muted');
+    font-size: clamp(17px, 1.5vw, 22px);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .address {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    margin-bottom: 32px;
+  }
+  .hero-cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 36px;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .hero-cta:hover { background: theme('colors.accent.hover'); transform: translateY(-2px); }
+  .hero-cta.secondary {
+    background: transparent;
+    color: theme('colors.text.DEFAULT');
+    border: 1px solid theme('colors.border');
+  }
+  .hero-cta.secondary:hover {
+    border-color: theme('colors.accent.DEFAULT');
+    color: theme('colors.accent.DEFAULT');
+    background: transparent;
+  }
+
+  .block { margin-bottom: 0; }
+  .block-title {
+    font-size: clamp(18px, 1.6vw, 22px);
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 24px;
+  }
+
+  .event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .event-card {
+    background: theme('colors.bg.card');
+    border: 1px solid theme('colors.border');
+    padding: 28px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .event-card:hover {
+    border-color: theme('colors.accent.DEFAULT');
+    transform: translateY(-2px);
+  }
+  .event-date {
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: theme('colors.accent.DEFAULT');
+    display: block;
+    margin-bottom: 16px;
+  }
+  .event-card h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .lineup { color: theme('colors.text.muted'); margin-bottom: 4px; }
+  .venue {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    margin-bottom: 20px;
+  }
+  .event-cta {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: theme('colors.accent.DEFAULT');
+    transition: color 0.2s;
+  }
+  .event-cta:hover { color: theme('colors.accent.hover'); }
+
+  .floor-section { margin-top: 96px; }
+  .mix-embed { margin-bottom: 16px; }
+  .yt-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 2px;
+    overflow: hidden;
+    background: theme('colors.bg.card');
+    margin-bottom: 16px;
+  }
+  .yt-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .see-all {
+    display: inline-block;
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .see-all:hover { color: theme('colors.accent.DEFAULT'); }
+
+  @media (max-width: 700px) {
+    .events-section { padding: 100px 24px 64px; }
+  }
+</style>

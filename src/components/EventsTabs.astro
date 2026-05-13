@@ -1,0 +1,47 @@
+---
+const { active } = Astro.props as { active: 'room' | 'carpet-club' };
+
+const tabs = [
+  { key: 'room', href: '/events/room', label: 'Room' },
+  { key: 'carpet-club', href: '/events/carpet-club', label: 'Carpet Club' },
+] as const;
+---
+
+<nav class="events-tabs" aria-label="Events sections">
+  {tabs.map((t) => (
+    <a
+      href={t.href}
+      class:list={['tab', { 'is-active': t.key === active }]}
+      aria-current={t.key === active ? 'page' : undefined}
+    >
+      {t.label}
+    </a>
+  ))}
+</nav>
+
+<style>
+  .events-tabs {
+    display: flex;
+    gap: 28px;
+    border-bottom: 1px solid theme('colors.border');
+    margin-bottom: 56px;
+  }
+  .tab {
+    display: inline-block;
+    padding: 14px 0;
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .tab:hover { color: theme('colors.text.DEFAULT'); }
+  .tab.is-active {
+    color: theme('colors.accent.DEFAULT');
+    border-bottom-color: theme('colors.accent.DEFAULT');
+  }
+</style>

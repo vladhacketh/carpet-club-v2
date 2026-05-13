@@ -1,0 +1,244 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Marquee from '~/components/Marquee.astro';
+import EventsTabs from '~/components/EventsTabs.astro';
+
+const BOOKING_EMAIL = 'kristina.carpetevents@gmail.com';
+const BOOKING_MAILTO = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent('Showcase Booking Inquiry')}`;
+const INSTAGRAM_URL = 'https://instagram.com/carpetclub_/';
+
+const heroLinks = [
+  { label: 'Resident Advisor', href: 'https://ra.co/promoters/55088' },
+  { label: 'Shotgun', href: 'https://shotgun.live/en/venues/carpet-snares-records' },
+  { label: 'Instagram', href: INSTAGRAM_URL },
+];
+
+type PastShowcase = { date: string; name: string; venue: string };
+const past: PastShowcase[] = [
+  { date: 'APR 2026', name: 'Carpet Club Invites 10 Yrs Home Again W/ Paramida', venue: 'Ministerium, Lisbon' },
+  { date: 'MAR 2026', name: "Carnival '26 w/ Mountain People", venue: 'Carmo Rooftop, Lisbon' },
+  { date: 'MAR 2026', name: 'Room 1 Year — Brawther · Jorge Caiado', venue: 'Rūmu, Lisbon' },
+  { date: 'NOV 2025', name: 'Carpet Club Pres. Distrikt 10 Years', venue: 'Ministerium, Lisbon' },
+  { date: 'OCT 2025', name: 'Carpet Axis Pres.: Faina & Untitled', venue: 'Myra Ostraria, Lisbon' },
+  { date: 'MAY 2025', name: 'Carpet 11 Years — Built Together', venue: 'Zé dos Bois Gallery, Lisbon' },
+  { date: 'APR 2025', name: 'House of Underground x Carpet Club: Dia da Liberdade w/ Carl Finlow', venue: 'Ministerium, Lisbon' },
+  { date: 'MAR 2025', name: "Rooftop Fighters w/ Yamour (Carnival '25)", venue: 'Carmo Rooftop, Lisbon' },
+  { date: 'DEC 2024', name: 'Carpet Club Presents Slow Life w/ Laurine & Cecilio, Alex Neri', venue: 'Ministerium, Lisbon' },
+  { date: 'NOV 2024', name: 'Carpet Club w/ Apple B & Hazr (Magic Carpet, UK)', venue: 'Rūmu, Lisbon' },
+  { date: 'SEP 2024', name: 'Carpet Club w/ Sibil', venue: 'Secret Location, Lisbon' },
+];
+---
+
+<BaseLayout
+  title="Carpet Club — Showcases"
+  description="Special events at different venues — Lisbon and beyond. Label nights, one-off collaborations, and curated experiences with guests from the international circuit."
+>
+  <section class="events-section">
+    <EventsTabs active="carpet-club" />
+
+    <header class="hero">
+      <p class="section-label">Special Events</p>
+      <h1>Showcases</h1>
+      <p class="lede">
+        Special events at different venues — Lisbon and beyond. Label nights, one-off
+        collaborations, and curated experiences with guests from the international circuit.
+      </p>
+      <div class="hero-cta-row">
+        {heroLinks.map((l) => (
+          <a href={l.href} target="_blank" rel="noopener noreferrer" class="hero-cta secondary">
+            {l.label} →
+          </a>
+        ))}
+      </div>
+    </header>
+
+    <div class="block">
+      <h2 class="block-title">Upcoming</h2>
+      <article class="event-card tba">
+        <p class="event-date">Coming Soon</p>
+        <h3>TBA</h3>
+        <p class="lineup">Stay tuned via <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+      </article>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title">Past</h2>
+      {past.length > 0 ? (
+        <div class="past-table">
+          {past.map((e) => (
+            <article class="past-row">
+              <time class="past-date">{e.date}</time>
+              <p class="past-name">{e.name}</p>
+              <p class="past-venue">{e.venue}</p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="past-empty">Past showcases will appear here soon.</p>
+      )}
+    </div>
+
+    <div class="cta-block">
+      <a href={BOOKING_MAILTO} class="hero-cta">Book a Showcase →</a>
+      <p class="cta-note">Want to bring Carpet Club to your city? We travel.</p>
+    </div>
+  </section>
+
+  <Marquee />
+</BaseLayout>
+
+<style>
+  .events-section {
+    padding: 140px 48px 96px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hero { margin-bottom: 80px; max-width: 760px; }
+  .section-label {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(40px, 6vw, 80px);
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .lede {
+    color: theme('colors.text.muted');
+    font-size: clamp(17px, 1.5vw, 22px);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 36px;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .hero-cta:hover { background: theme('colors.accent.hover'); transform: translateY(-2px); }
+  .hero-cta.secondary {
+    background: transparent;
+    color: theme('colors.text.DEFAULT');
+    border: 1px solid theme('colors.border');
+  }
+  .hero-cta.secondary:hover {
+    border-color: theme('colors.accent.DEFAULT');
+    color: theme('colors.accent.DEFAULT');
+    background: transparent;
+  }
+
+  .block { margin-bottom: 64px; }
+  .block-title {
+    font-size: clamp(18px, 1.6vw, 22px);
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 24px;
+  }
+
+  .event-card {
+    background: theme('colors.bg.card');
+    border: 1px solid theme('colors.border');
+    padding: 28px;
+    max-width: 420px;
+  }
+  .event-card.tba { border-style: dashed; }
+  .event-date {
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.accent.DEFAULT');
+    display: block;
+    margin-bottom: 16px;
+  }
+  .event-card h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .lineup { color: theme('colors.text.muted'); }
+  .lineup a {
+    color: theme('colors.text.DEFAULT');
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s;
+  }
+  .lineup a:hover { color: theme('colors.accent.DEFAULT'); }
+
+  .past-table {
+    max-width: 880px;
+    border-top: 1px solid theme('colors.border');
+  }
+  .past-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 200px;
+    gap: 32px;
+    padding: 20px 0;
+    border-bottom: 1px solid theme('colors.border');
+    align-items: center;
+  }
+  .past-date {
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: theme('colors.accent.DEFAULT');
+  }
+  .past-name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .past-venue {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    text-align: right;
+  }
+  .past-empty {
+    color: theme('colors.text.muted');
+    font-family: theme('fontFamily.mono');
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .cta-block {
+    margin-top: 96px;
+    padding-top: 48px;
+    border-top: 1px solid theme('colors.border');
+  }
+  .cta-note {
+    margin-top: 20px;
+    color: theme('colors.text.muted');
+    font-size: clamp(15px, 1.3vw, 18px);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 700px) {
+    .events-section { padding: 100px 24px 64px; }
+    .past-row { grid-template-columns: 100px 1fr; gap: 16px; }
+    .past-venue { grid-column: 1 / -1; text-align: left; }
+  }
+</style>

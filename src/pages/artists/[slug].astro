@@ -15,8 +15,15 @@ interface Props {
   artist: CollectionEntry<'artists'>;
 }
 const { artist } = Astro.props;
-const { name, role, image, socials } = artist.data;
+const { name, role, image, mix, socials } = artist.data;
 const { Content } = await artist.render();
+
+const ytMatch = mix?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})(?:[?&].*?[?&]?t=(\d+))?/);
+const ytId = ytMatch?.[1];
+const ytStart = mix?.match(/[?&]t=(\d+)/)?.[1];
+const ytEmbed = ytId
+  ? `https://www.youtube-nocookie.com/embed/${ytId}${ytStart ? `?start=${ytStart}` : ''}`
+  : null;
 
 const webp = image?.replace(/\.(jpe?g|png)$/i, '.webp');
 
@@ -95,22 +102,36 @@ const schema = {
       </div>
     </div>
 
-    <section class="mix-section" aria-labelledby="mix-heading">
-      <p class="section-label">Latest Mix</p>
-      <h2 id="mix-heading">Sounds from {name}</h2>
-      <div class="mix-placeholder">
-        <p>
-          {socials.soundcloud ? (
-            <>
-              SoundCloud embed slot. Paste a track URL into <code>src/pages/artists/[slug].astro</code>,
-              or visit <a href={socials.soundcloud} target="_blank" rel="noopener noreferrer">{name}'s SoundCloud</a> directly.
-            </>
+    {mix && (
+      <section class="mix-section" aria-label="Latest">
+        <p class="section-label">Latest</p>
+        <div class="mix-embed">
+          {ytEmbed ? (
+            <div class="yt-wrap">
+              <iframe
+                src={ytEmbed}
+                title={`${name} — mix`}
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
           ) : (
-            <>No SoundCloud profile linked yet. Add one to <code>src/content/artists/{artist.slug}.md</code>.</>
+            <iframe
+              width="100%"
+              height="166"
+              scrolling="no"
+              frameborder="no"
+              allow="autoplay"
+              src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(mix)}&color=%23ff3c78&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false`}
+            ></iframe>
           )}
-        </p>
-      </div>
-    </section>
+          <a href={mix} target="_blank" rel="noopener noreferrer" class="see-all">
+            {ytEmbed ? 'Watch on YouTube →' : 'Listen on Soundcloud →'}
+          </a>
+        </div>
+      </section>
+    )}
   </article>
 
   <Marquee />
@@ -233,34 +254,41 @@ const schema = {
     letter-spacing: 5px;
     text-transform: uppercase;
     color: theme('colors.accent.DEFAULT');
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
-  .mix-section h2 {
-    font-size: clamp(28px, 4vw, 44px);
-    font-weight: 700;
-    letter-spacing: -1px;
-    margin-bottom: 32px;
+  .mix-embed { margin-bottom: 16px; }
+  .mix-embed > iframe {
+    display: block;
+    width: 100%;
+    border-radius: 2px;
   }
-  .mix-placeholder {
+  .yt-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 2px;
+    overflow: hidden;
     background: theme('colors.bg.card');
-    border: 1px dashed theme('colors.border');
-    padding: 48px 32px;
-    color: theme('colors.text.muted');
-    line-height: 1.6;
-    border-radius: 2px;
+    margin-bottom: 16px;
   }
-  .mix-placeholder a {
-    color: theme('colors.accent.DEFAULT');
-    text-decoration: underline;
+  .yt-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
-  .mix-placeholder code {
+  .see-all {
+    display: inline-block;
     font-family: theme('fontFamily.mono');
-    font-size: 12px;
-    color: theme('colors.accent.DEFAULT');
-    background: rgba(255, 60, 120, 0.08);
-    padding: 2px 6px;
-    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.DEFAULT');
+    text-decoration: none;
+    transition: color 0.2s;
   }
+  .see-all:hover { color: theme('colors.accent.DEFAULT'); }
 
   @media (max-width: 800px) {
     .artist-detail { padding: 100px 24px 64px; }

@@ -6,6 +6,7 @@ const artists = defineCollection({
     name: z.string(),
     role: z.string().default('Resident'),
     image: z.string().optional(),
+    mix: z.string().url().optional(),
     socials: z.object({
       instagram: z.string().url().optional(),
       soundcloud: z.string().url().optional(),

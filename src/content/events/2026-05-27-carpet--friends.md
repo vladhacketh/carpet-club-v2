@@ -6,5 +6,5 @@ status: "upcoming"
 lineup:
   - "Kaesar"
   - "Kristina"
-shotgun: "https://shotgun.live/en/events/carpet-friends-kaesar-kristina/tickets"
+shotgun: "https://shotgun.live/en/events/room-wednesdays-curated-by-carpet-club-65"
 ---

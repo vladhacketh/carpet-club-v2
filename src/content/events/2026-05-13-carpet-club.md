@@ -6,5 +6,5 @@ status: "upcoming"
 lineup:
   - "Pedro Goya"
   - "Nebulaee"
-shotgun: "https://shotgun.live/en/events/carpet-club-pedro-goya-nebulaee/tickets"
+shotgun: "https://shotgun.live/en/events/room-wednesdays-curated-by-carpet-club-63"
 ---

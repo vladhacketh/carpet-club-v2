@@ -6,5 +6,5 @@ status: "upcoming"
 lineup:
   - "Tripmastaz"
   - "SaPu"
-shotgun: "https://shotgun.live/en/events/rhythm-by-nature-tripmastaz-sapu/tickets"
+shotgun: "https://shotgun.live/en/events/room-wednesdays-curated-by-carpet-club-64"
 ---

@@ -5,5 +5,5 @@ venue: "Rūmu"
 status: "upcoming"
 lineup:
   - "Momo Trosman"
-shotgun: "https://shotgun.live/en/events/tini-presents-the-gang-momo-trosman/tickets"
+shotgun: "https://shotgun.live/en/events/room-wednesdays-curated-by-carpet-club-62"
 ---

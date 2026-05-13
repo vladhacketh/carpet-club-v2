@@ -112,32 +112,18 @@ const schema = {
       <h2 id="mix-heading">From the Floor</h2>
     </header>
     <div class="mix-embed">
-      <div class="mix-placeholder">
-        <p class="mix-placeholder-text">
-          SoundCloud embed slot — paste a track URL into <code>src/pages/index.astro</code> to wire it up.
-        </p>
-        <a href="https://soundcloud.com/carpetandsnares" target="_blank" rel="noopener noreferrer" class="see-all">
-          Listen on Soundcloud →
-        </a>
-      </div>
+      <iframe
+        width="100%"
+        height="166"
+        scrolling="no"
+        frameborder="no"
+        allow="autoplay"
+        src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/carpetandsnares/sevensolb2bhenryhodsonatroom&color=%23ff3c78&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false"
+      ></iframe>
+      <a href="https://soundcloud.com/carpetandsnares/sevensolb2bhenryhodsonatroom?in=carpetandsnares/sets/live-recordings-from-our-room" target="_blank" rel="noopener noreferrer" class="see-all">
+        Listen on Soundcloud →
+      </a>
     </div>
-  </section>
-
-  <section class="content-section photo-section" aria-labelledby="photos-heading">
-    <header class="section-header">
-      <p class="section-label">Photos from the Floor</p>
-      <h2 id="photos-heading">Recent Wednesdays</h2>
-    </header>
-    <div class="photo-strip">
-      {[1, 2, 3, 4].map((i) => (
-        <div class="photo-cell" aria-hidden="true">
-          <span>Photo {i}</span>
-        </div>
-      ))}
-    </div>
-    <a href="https://instagram.com/carpetclub_/" target="_blank" rel="noopener noreferrer" class="see-all">
-      More on Instagram →
-    </a>
   </section>
 
   <Marquee />
@@ -345,49 +331,14 @@ const schema = {
   .see-all:hover { color: theme('colors.accent.DEFAULT'); }
 
   .mix-section { padding-top: 24px; }
-  .mix-embed { margin-bottom: 8px; }
-  .mix-placeholder {
-    background: theme('colors.bg.card');
-    border: 1px dashed theme('colors.border');
-    padding: 48px 32px;
-    text-align: center;
-    border-radius: 2px;
-  }
-  .mix-placeholder-text {
-    color: theme('colors.text.muted');
-    font-size: 14px;
-    margin-bottom: 16px;
-  }
-  .mix-placeholder code {
-    font-family: theme('fontFamily.mono');
-    font-size: 12px;
-    color: theme('colors.accent.DEFAULT');
-    background: rgba(255, 60, 120, 0.08);
-    padding: 2px 6px;
+  .mix-embed { margin-bottom: 16px; }
+  .mix-embed iframe {
+    display: block;
+    width: 100%;
     border-radius: 2px;
   }
 
-  .photo-section { padding-top: 24px; padding-bottom: 64px; }
-  .photo-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-  }
-  .photo-cell {
-    aspect-ratio: 1/1;
-    background: theme('colors.bg.card');
-    border: 1px dashed theme('colors.border');
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: theme('colors.text.muted');
-    font-family: theme('fontFamily.mono');
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
   @media (max-width: 700px) {
-    .photo-strip { grid-template-columns: repeat(2, 1fr); }
     .content-section { padding: 56px 24px 64px; }
     .hero { padding: 100px 16px 60px; }
   }

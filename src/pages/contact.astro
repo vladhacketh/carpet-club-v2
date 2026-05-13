@@ -18,9 +18,18 @@ const web3formsKey = site.web3formsKey;
   description="Bookings, press, and general inquiries — Carpet Club, Lisbon."
 >
   <section class="contact-section">
-    <header class="contact-header" data-drip data-drip-intensity="32">
-      <span class="contact-mark-line">Carpet</span>
-      <span class="contact-mark-line">Club</span>
+    <header class="contact-header">
+      <picture class="contact-logo-wrap" data-drip data-drip-intensity="32">
+        <source srcset="/assets/carpet-hero.webp" type="image/webp" />
+        <img
+          src="/assets/carpet-hero.png"
+          alt="Carpet"
+          class="contact-logo"
+          width="1400"
+          height="989"
+          decoding="async"
+        />
+      </picture>
     </header>
 
     <div class="contact-grid">
@@ -98,23 +107,21 @@ const web3formsKey = site.web3formsKey;
   .contact-header {
     margin-bottom: 80px;
     display: flex;
-    flex-direction: column;
-    gap: 0;
+    justify-content: flex-start;
+  }
+  .contact-logo-wrap {
+    display: block;
     cursor: pointer;
   }
-  .contact-mark-line {
-    font-size: clamp(56px, 14vw, 168px);
-    font-weight: 700;
-    line-height: 0.88;
-    letter-spacing: -4px;
-    color: theme('colors.text.DEFAULT');
+  .contact-logo {
+    width: clamp(180px, 28vw, 360px);
+    height: auto;
+    display: block;
+    margin: 0;
+    transition: filter 0.1s;
   }
-  .contact-mark-line:nth-child(2) {
-    color: transparent;
-    -webkit-text-stroke: 1.5px theme('colors.text.muted');
-  }
-  .contact-header:hover .contact-mark-line,
-  .contact-header:focus-within .contact-mark-line {
+  .contact-logo-wrap:hover .contact-logo,
+  .contact-logo-wrap:focus-within .contact-logo {
     filter: url(#drip);
   }
 

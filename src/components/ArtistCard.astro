@@ -94,8 +94,8 @@ const webp = image?.replace(/\.(jpe?g|png)$/i, '.webp');
   .artist-card-img {
     object-fit: cover;
     object-position: center 30%;
-    transition: transform 0.5s, filter 0.4s;
-    filter: grayscale(20%);
+    transition: transform 0.5s, filter 0.45s ease;
+    filter: grayscale(100%);
   }
   .artist-card:hover .artist-card-img,
   .artist-card:focus-within .artist-card-img {

@@ -3,7 +3,9 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import { getCollection } from 'astro:content';
 
-const upcoming = (await getCollection('events', ({ data }) => data.status === 'upcoming'))
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const upcoming = (await getCollection('events', ({ data }) => data.status === 'upcoming' && data.date >= today))
   .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
   .slice(0, 2);
 

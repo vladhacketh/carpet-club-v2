@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
+import MailChooser from '~/components/MailChooser.astro';
 import { site } from '~/lib/site';
+
+const BOOKING_EMAIL = 'info@carpetclub.pt';
 
 const platforms = [
   { label: 'Instagram', handle: '@carpetclub_', url: site.social.instagram },
@@ -60,8 +63,14 @@ const web3formsKey = site.web3formsKey;
 
       <div class="contact-col">
         <h2 class="col-label">Bookings &amp; Events</h2>
-        <a href="mailto:info@carpetclub.pt" class="big-email">
-          info@carpetclub.pt
+        <a
+          href={`mailto:${BOOKING_EMAIL}`}
+          class="big-email"
+          data-book-trigger
+          aria-haspopup="dialog"
+          aria-controls="book-modal"
+        >
+          {BOOKING_EMAIL}
         </a>
 
         <form id="contactForm" class="contact-form" novalidate>
@@ -94,6 +103,12 @@ const web3formsKey = site.web3formsKey;
       </div>
     </div>
   </section>
+
+  <MailChooser
+    email={BOOKING_EMAIL}
+    title="Email Carpet Club"
+    subtitle="Choose how to send your message"
+  />
 
   <Marquee />
 </BaseLayout>

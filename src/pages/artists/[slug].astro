@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
+import MailChooser from '~/components/MailChooser.astro';
 
 export async function getStaticPaths() {
   const artists = await getCollection('artists');
@@ -34,6 +35,11 @@ const platforms: Array<{ label: string; url?: string }> = [
   { label: 'Resident Advisor', url: socials.ra },
 ];
 const linked = platforms.filter((p) => p.url);
+
+const BOOKING_EMAIL = 'info@carpetclub.pt';
+const bookingSubject = `Booking inquiry: ${name}`;
+const bookingBody = `Hi Carpet Club,\n\nI'd like to inquire about booking ${name}.\n\n`;
+const bookingMailto = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent(bookingSubject)}&body=${encodeURIComponent(bookingBody)}`;
 
 const schema = {
   '@context': 'https://schema.org',
@@ -92,15 +98,26 @@ const schema = {
         )}
 
         <a
-          href={`mailto:info@carpetclub.pt?subject=${encodeURIComponent(`Booking inquiry: ${name}`)}&body=${encodeURIComponent(`Hi Carpet Club,\n\nI'd like to inquire about booking ${name}.\n\n`)}`}
+          href={bookingMailto}
           class="book-btn"
           data-drip
           data-drip-intensity="28"
+          data-book-trigger
+          aria-haspopup="dialog"
+          aria-controls="book-modal"
         >
           Book {name} →
         </a>
       </div>
     </div>
+
+    <MailChooser
+      email={BOOKING_EMAIL}
+      subject={bookingSubject}
+      body={bookingBody}
+      title={`Book ${name}`}
+      subtitle="Choose how to send your inquiry"
+    />
 
     {mix && (
       <section class="mix-section" aria-label="Latest">

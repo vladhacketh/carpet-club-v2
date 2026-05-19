@@ -1,0 +1,290 @@
+---
+interface Props {
+  email: string;
+  subject?: string;
+  body?: string;
+  title: string;
+  subtitle?: string;
+}
+
+const {
+  email,
+  subject = '',
+  body = '',
+  title,
+  subtitle = 'Choose how to send your message',
+} = Astro.props;
+
+const encSubject = subject ? encodeURIComponent(subject) : '';
+const encBody = body ? encodeURIComponent(body) : '';
+
+const mailtoParts = [
+  subject && `subject=${encSubject}`,
+  body && `body=${encBody}`,
+].filter(Boolean);
+const mailtoHref = mailtoParts.length
+  ? `mailto:${email}?${mailtoParts.join('&')}`
+  : `mailto:${email}`;
+
+const gmailParts = [
+  `to=${email}`,
+  subject && `su=${encSubject}`,
+  body && `body=${encBody}`,
+].filter(Boolean);
+const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&${gmailParts.join('&')}`;
+
+const outlookParts = [
+  `to=${email}`,
+  subject && `subject=${encSubject}`,
+  body && `body=${encBody}`,
+].filter(Boolean);
+const outlookHref = `https://outlook.office.com/mail/deeplink/compose?${outlookParts.join('&')}`;
+---
+
+<div
+  id="book-modal"
+  class="book-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="book-modal-title"
+  hidden
+>
+  <div class="book-modal-backdrop" data-book-close></div>
+  <div class="book-modal-panel" role="document">
+    <button
+      type="button"
+      class="book-modal-close"
+      data-book-close
+      aria-label="Close dialog"
+    >
+      ×
+    </button>
+    <h2 id="book-modal-title" class="book-modal-title">{title}</h2>
+    <p class="book-modal-sub">{subtitle}</p>
+    <div class="book-modal-options">
+      <a
+        href={gmailHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="book-modal-option"
+        data-book-action="external"
+      >
+        Open in Gmail
+      </a>
+      <a
+        href={outlookHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="book-modal-option"
+        data-book-action="external"
+      >
+        Open in Outlook
+      </a>
+      <a
+        href={mailtoHref}
+        class="book-modal-option"
+        data-book-action="mailto"
+      >
+        Use default mail app
+      </a>
+      <button
+        type="button"
+        class="book-modal-option"
+        data-book-action="copy"
+        data-book-email={email}
+      >
+        Copy email address
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .book-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .book-modal[hidden] { display: none; }
+  .book-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 10, 0.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .book-modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: theme('colors.bg.card');
+    border: 1px solid theme('colors.border');
+    border-radius: 2px;
+    padding: 32px 28px 28px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  }
+  .book-modal-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: 0;
+    color: theme('colors.text.muted');
+    font-size: 24px;
+    line-height: 1;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .book-modal-close:hover,
+  .book-modal-close:focus-visible {
+    color: theme('colors.accent.DEFAULT');
+    outline: none;
+  }
+  .book-modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    word-break: break-word;
+  }
+  .book-modal-sub {
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    margin-bottom: 24px;
+  }
+  .book-modal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .book-modal-option {
+    display: block;
+    width: 100%;
+    padding: 14px 18px;
+    background: transparent;
+    border: 1px solid theme('colors.border');
+    border-radius: 2px;
+    color: theme('colors.text.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  }
+  .book-modal-option:hover,
+  .book-modal-option:focus-visible {
+    border-color: theme('colors.accent.DEFAULT');
+    color: theme('colors.accent.DEFAULT');
+    outline: none;
+    transform: translateX(4px);
+  }
+</style>
+
+<script>
+  (function () {
+    const trigger = document.querySelector<HTMLElement>('[data-book-trigger]');
+    const modal = document.getElementById('book-modal');
+    if (!trigger || !modal) return;
+
+    const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    let prevOverflow = '';
+    let savedReturn: HTMLElement | null = null;
+
+    function focusables(): HTMLElement[] {
+      return Array.from(modal!.querySelectorAll<HTMLElement>(FOCUSABLE));
+    }
+
+    function open() {
+      savedReturn = (document.activeElement as HTMLElement) ?? trigger;
+      modal!.hidden = false;
+      prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const firstOption = modal!.querySelector<HTMLElement>('[data-book-action]');
+      (firstOption ?? focusables()[0])?.focus();
+      document.addEventListener('keydown', onKey);
+    }
+
+    function close() {
+      modal!.hidden = true;
+      document.body.style.overflow = prevOverflow;
+      document.removeEventListener('keydown', onKey);
+      (savedReturn ?? trigger).focus();
+    }
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const list = focusables();
+      if (list.length === 0) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && (active === first || !modal!.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      open();
+    });
+
+    modal.querySelectorAll<HTMLElement>('[data-book-close]').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        close();
+      });
+    });
+
+    modal.querySelectorAll<HTMLElement>('[data-book-action]').forEach((opt) => {
+      opt.addEventListener('click', async (e) => {
+        const action = opt.dataset.bookAction;
+        if (action === 'copy') {
+          e.preventDefault();
+          const email = opt.dataset.bookEmail ?? '';
+          let ok = false;
+          try {
+            await navigator.clipboard.writeText(email);
+            ok = true;
+          } catch {
+            const ta = document.createElement('textarea');
+            ta.value = email;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { ok = document.execCommand('copy'); } catch { ok = false; }
+            ta.remove();
+          }
+          const original = opt.textContent;
+          opt.textContent = ok ? 'Copied!' : 'Copy failed';
+          window.setTimeout(() => { opt.textContent = original; }, 1500);
+          return;
+        }
+        // Gmail/Outlook/mailto: let the browser handle navigation, then close.
+        window.setTimeout(close, 0);
+      });
+    });
+  })();
+</script>

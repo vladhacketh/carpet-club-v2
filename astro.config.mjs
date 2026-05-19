@@ -10,7 +10,7 @@ export default defineConfig({
   },
   integrations: [
     tailwind({ applyBaseStyles: false }),
-    sitemap(),
+    sitemap({ filter: (page) => page !== "https://www.carpetclub.pt/events/" }),
   ],
   build: {
     inlineStylesheets: 'auto',

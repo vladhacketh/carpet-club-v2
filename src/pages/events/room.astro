@@ -37,7 +37,7 @@ const events_schema = {
       address: { '@type': 'PostalAddress', addressLocality: 'Lisbon', addressCountry: 'PT' },
     },
     performer: e.data.lineup.map((name) => ({ '@type': 'PerformingGroup', name })),
-    organizer: { '@type': 'Organization', name: 'Carpet Club', url: 'https://carpetclub.lisbon' },
+    organizer: { '@type': 'Organization', name: 'Carpet Club', url: 'https://www.carpetclub.pt' },
     ...(e.data.shotgun && { offers: { '@type': 'Offer', url: e.data.shotgun, availability: 'https://schema.org/InStock' } }),
   })),
 };

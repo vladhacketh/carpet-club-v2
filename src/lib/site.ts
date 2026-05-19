@@ -7,7 +7,7 @@
 
 export const site = {
   /** Production URL. Set this to your real domain when you deploy. */
-  url: 'https://carpetclub.lisbon',
+  url: 'https://www.carpetclub.pt',
 
   /** Brand */
   name: 'Carpet Club',

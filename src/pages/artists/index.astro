@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import ArtistCard from '~/components/ArtistCard.astro';
 import Marquee from '~/components/Marquee.astro';
 import { getCollection } from 'astro:content';
 
 const artists = (await getCollection('artists')).sort((a, b) =>
   a.data.name.localeCompare(b.data.name),
 );
+const loop = [...artists, ...artists];
 ---
 
 <BaseLayout
@@ -22,8 +22,39 @@ const artists = (await getCollection('artists')).sort((a, b) =>
       </p>
     </header>
 
-    <div class="artists-grid">
-      {artists.map((artist) => <ArtistCard artist={artist} />)}
+    <div class="artist-marquee" aria-label="Resident DJs">
+      <ul class="artist-track" role="list">
+        {loop.map((a, i) => {
+          const duplicate = i >= artists.length;
+          const webp = a.data.image?.replace(/\.(jpe?g|png)$/i, '.webp');
+          return (
+            <li class="artist-item" aria-hidden={duplicate ? 'true' : undefined}>
+              <a
+                href={`/artists/${a.slug}`}
+                class="artist-link"
+                tabindex={duplicate ? -1 : undefined}
+              >
+                {a.data.image && (
+                  <picture class="artist-frame">
+                    {webp && webp !== a.data.image && (
+                      <source srcset={webp} type="image/webp" />
+                    )}
+                    <img
+                      src={a.data.image}
+                      alt={a.data.name}
+                      width="900"
+                      height="900"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </picture>
+                )}
+                <span class="artist-name">{a.data.name}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
     </div>
 
     <div class="book-cta">
@@ -69,17 +100,79 @@ const artists = (await getCollection('artists')).sort((a, b) =>
     line-height: 1.6;
   }
 
-  .artists-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: theme('colors.border');
+  .artist-marquee {
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin: 0 -48px;
+    padding: 24px 0;
+    border-top: 1px solid theme('colors.border');
+    border-bottom: 1px solid theme('colors.border');
+    mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: auto;
+    cursor: grab;
   }
-  @media (max-width: 900px) { .artists-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 500px) { .artists-grid { grid-template-columns: 1fr; } }
+  .artist-marquee::-webkit-scrollbar { display: none; }
+  .artist-marquee.is-grabbing { cursor: grabbing; }
+  .artist-track {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    width: max-content;
+    padding: 0 32px;
+    margin: 0;
+    list-style: none;
+  }
+  .artist-item { flex: 0 0 auto; }
+  .artist-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: theme('colors.text.muted');
+    transition: color 0.25s;
+  }
+  .artist-frame {
+    display: block;
+    width: 240px;
+    height: 240px;
+    overflow: hidden;
+    background: theme('colors.bg.card');
+  }
+  .artist-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    display: block;
+    filter: grayscale(100%);
+    transition: filter 0.45s ease, transform 0.5s ease;
+  }
+  .artist-link:hover .artist-frame img,
+  .artist-link:focus-visible .artist-frame img {
+    filter: grayscale(0%);
+    transform: scale(1.04);
+  }
+  .artist-link:hover,
+  .artist-link:focus-visible {
+    color: theme('colors.accent.DEFAULT');
+    outline: none;
+  }
+  .artist-name {
+    font-family: theme('fontFamily.mono');
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 
   .book-cta {
-    margin-top: 64px;
+    margin-top: 72px;
     text-align: center;
   }
   .hero-cta {
@@ -99,15 +192,119 @@ const artists = (await getCollection('artists')).sort((a, b) =>
     transition: all 0.2s;
   }
   .hero-cta:hover { background: theme('colors.accent.hover'); transform: translateY(-2px); }
-  .hint {
-    margin-top: 16px;
-    font-family: theme('fontFamily.mono');
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: theme('colors.text.muted');
-  }
-  .hint a { color: theme('colors.text.muted'); text-decoration: underline; }
-  .hint a:hover { color: theme('colors.accent.DEFAULT'); }
 
-  @media (max-width: 700px) { .artists-section { padding: 100px 24px 64px; } }
+  @media (max-width: 700px) {
+    .artists-section { padding: 100px 24px 64px; }
+    .artist-marquee { margin: 0 -24px; }
+    .artist-frame { width: 180px; height: 180px; }
+    .artist-track { gap: 24px; }
+    .artist-name { font-size: 11px; letter-spacing: 2px; }
+  }
 </style>
+
+<script>
+  (function () {
+    const marquee = document.querySelector<HTMLElement>('.artist-marquee');
+    const track = marquee?.querySelector<HTMLElement>('.artist-track');
+    if (!marquee || !track) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const SPEED = 0.6; // px per frame (~36 px/s at 60 fps)
+    const RESUME_DELAY = 1500;
+
+    let autoEnabled = !reducedMotion;
+    let hovered = false;
+    let lastInteraction = 0;
+    let programmaticScroll = false;
+
+    function halfWidth() {
+      return track!.scrollWidth / 2;
+    }
+
+    function wrap() {
+      const half = halfWidth();
+      if (half <= 0) return;
+      if (marquee!.scrollLeft >= half) {
+        programmaticScroll = true;
+        marquee!.scrollLeft -= half;
+      } else if (marquee!.scrollLeft < 0) {
+        programmaticScroll = true;
+        marquee!.scrollLeft += half;
+      }
+    }
+
+    function tick() {
+      const idle = performance.now() - lastInteraction > RESUME_DELAY;
+      if (autoEnabled && !hovered && idle) {
+        programmaticScroll = true;
+        marquee!.scrollLeft += SPEED;
+      }
+      wrap();
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    function noteInteraction() {
+      lastInteraction = performance.now();
+    }
+
+    marquee.addEventListener('pointerenter', () => { hovered = true; });
+    marquee.addEventListener('pointerleave', () => { hovered = false; });
+
+    marquee.addEventListener('scroll', () => {
+      if (programmaticScroll) {
+        programmaticScroll = false;
+        return;
+      }
+      noteInteraction();
+      wrap();
+    });
+
+    // Mouse wheel: translate vertical wheel input into horizontal scroll so
+    // people on a regular mouse can browse the marquee. Touchpad horizontal
+    // swipes (deltaX) keep the native behavior.
+    marquee.addEventListener('wheel', (e) => {
+      const dx = e.deltaX;
+      const dy = e.deltaY;
+      if (Math.abs(dx) >= Math.abs(dy)) {
+        // Horizontal-dominant input — let the browser handle it natively.
+        noteInteraction();
+        return;
+      }
+      e.preventDefault();
+      marquee.scrollLeft += dy;
+      noteInteraction();
+    }, { passive: false });
+
+    // Drag-to-scroll (mouse): hold and drag horizontally.
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartScroll = 0;
+
+    marquee.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      // Ignore drags that begin on a link — let normal clicks work.
+      if ((e.target as HTMLElement).closest('a')) return;
+      dragging = true;
+      dragStartX = e.clientX;
+      dragStartScroll = marquee.scrollLeft;
+      marquee.classList.add('is-grabbing');
+      marquee.setPointerCapture(e.pointerId);
+    });
+
+    marquee.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      marquee.scrollLeft = dragStartScroll - (e.clientX - dragStartX);
+      noteInteraction();
+    });
+
+    function endDrag(e: PointerEvent) {
+      if (!dragging) return;
+      dragging = false;
+      marquee.classList.remove('is-grabbing');
+      try { marquee.releasePointerCapture(e.pointerId); } catch {}
+    }
+    marquee.addEventListener('pointerup', endDrag);
+    marquee.addEventListener('pointercancel', endDrag);
+  })();
+</script>

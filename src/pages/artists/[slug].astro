@@ -19,7 +19,7 @@ const { artist } = Astro.props;
 const { name, role, image, mix, socials } = artist.data;
 const { Content } = await artist.render();
 
-const ytMatch = mix?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})(?:[?&].*?[?&]?t=(\d+))?/);
+const ytMatch = mix?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})(?:[?&].*?[?&]?t=(\d+))?/);
 const ytId = ytMatch?.[1];
 const ytStart = mix?.match(/[?&]t=(\d+)/)?.[1];
 const ytEmbed = ytId

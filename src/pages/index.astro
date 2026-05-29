@@ -72,7 +72,7 @@ const schema = {
       </a>
 
       <div class="hero-meta">
-        <span>Wednesday Residency</span>
+        <span>Weekly Residency</span>
         <span aria-hidden="true">·</span>
         <span>Rūmu, Lisbon</span>
         <span aria-hidden="true">·</span>
@@ -85,24 +85,33 @@ const schema = {
     <section class="content-section" aria-labelledby="now-next-heading">
       <header class="section-header">
         <p class="section-label">Now &amp; Next</p>
-        <h2 id="now-next-heading">Upcoming Wednesdays</h2>
+        <h2 id="now-next-heading">Upcoming</h2>
       </header>
       <div class="event-cards">
-        {upcoming.map((e) => (
-          <article class="event-card">
-            <time datetime={e.data.date.toISOString()} class="event-date">
-              {fmtDate(e.data.date)}
-            </time>
-            <h3>{e.data.title}</h3>
-            <p class="lineup">{e.data.lineup.join(' · ')}</p>
-            <p class="venue">{e.data.venue}, Lisbon</p>
-            {e.data.shotgun && (
-              <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
-                Tickets on Shotgun →
-              </a>
-            )}
-          </article>
-        ))}
+        {upcoming.map((e) => {
+          const isUnusualDay = e.data.date.getDay() !== 3;
+          const dayName = e.data.date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+          return (
+            <article class:list={['event-card', { 'is-unusual-day': isUnusualDay }]}>
+              {isUnusualDay && (
+                <span class="day-badge" title="Not the usual Wednesday">
+                  {dayName}
+                </span>
+              )}
+              <time datetime={e.data.date.toISOString()} class="event-date">
+                {fmtDate(e.data.date)}
+              </time>
+              <h3>{e.data.title}</h3>
+              <p class="lineup">{e.data.lineup.join(' · ')}</p>
+              <p class="venue">{e.data.venue}, Lisbon</p>
+              {e.data.shotgun && (
+                <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
+                  Tickets on Shotgun →
+                </a>
+              )}
+            </article>
+          );
+        })}
       </div>
       <a href="/events" class="see-all">See full schedule →</a>
     </section>
@@ -278,6 +287,22 @@ const schema = {
     border: 1px solid theme('colors.border');
     padding: 28px;
     transition: border-color 0.2s, transform 0.2s;
+  }
+  .event-card.is-unusual-day {
+    border-color: theme('colors.accent.DEFAULT');
+  }
+  .day-badge {
+    display: inline-block;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 14px;
   }
   .event-card:hover {
     border-color: theme('colors.accent.DEFAULT');

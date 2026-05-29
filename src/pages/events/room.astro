@@ -72,23 +72,32 @@ const events_schema = {
 
     {upcoming.length > 0 && (
       <div class="block">
-        <h2 class="block-title">May Schedule</h2>
+        <h2 class="block-title">June Schedule</h2>
         <div class="event-grid">
-          {upcoming.map((e) => (
-            <article class="event-card">
-              <time datetime={e.data.date.toISOString()} class="event-date">
-                {fmtDateLong(e.data.date)}
-              </time>
-              <h3>{e.data.title}</h3>
-              <p class="lineup">{e.data.lineup.join(' · ')}</p>
-              <p class="venue">{e.data.venue}, Lisbon</p>
-              {e.data.shotgun && (
-                <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
-                  Tickets on Shotgun →
-                </a>
-              )}
-            </article>
-          ))}
+          {upcoming.map((e) => {
+            const isUnusualDay = e.data.date.getDay() !== 3;
+            const dayName = e.data.date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+            return (
+              <article class:list={['event-card', { 'is-unusual-day': isUnusualDay }]}>
+                {isUnusualDay && (
+                  <span class="day-badge" title="Not the usual Wednesday">
+                    Heads up — {dayName}
+                  </span>
+                )}
+                <time datetime={e.data.date.toISOString()} class="event-date">
+                  {fmtDateLong(e.data.date)}
+                </time>
+                <h3>{e.data.title}</h3>
+                <p class="lineup">{e.data.lineup.join(' · ')}</p>
+                <p class="venue">{e.data.venue}, Lisbon</p>
+                {e.data.shotgun && (
+                  <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
+                    Tickets on Shotgun →
+                  </a>
+                )}
+              </article>
+            );
+          })}
         </div>
       </div>
     )}
@@ -208,6 +217,22 @@ const events_schema = {
   .event-card:hover {
     border-color: theme('colors.accent.DEFAULT');
     transform: translateY(-2px);
+  }
+  .event-card.is-unusual-day {
+    border-color: theme('colors.accent.DEFAULT');
+  }
+  .day-badge {
+    display: inline-block;
+    background: theme('colors.accent.DEFAULT');
+    color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 14px;
   }
   .event-date {
     font-family: theme('fontFamily.mono');

@@ -6,4 +6,5 @@ status: "upcoming"
 lineup:
   - "Andres Zacco"
   - "Jorge Caiado"
+shotgun: "https://shotgun.live/en/events/room-wednesdays-curated-by-carpet-club-68"
 ---

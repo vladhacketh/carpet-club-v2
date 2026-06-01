@@ -6,4 +6,5 @@ status: "upcoming"
 lineup:
   - "Worm Class"
   - "Zé Ferreira"
+shotgun: "https://shotgun.live/en/events/room-wednesdays-curated-by-carpet-club-67"
 ---

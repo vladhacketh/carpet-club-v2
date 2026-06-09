@@ -2,7 +2,7 @@
 date: 2026-06-03
 title: "House Mouse"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Bass Toast"
   - "Sara Wual (live)"

@@ -4,10 +4,23 @@ import Marquee from '~/components/Marquee.astro';
 import EventsTabs from '~/components/EventsTabs.astro';
 import { getCollection } from 'astro:content';
 
+// The Room page shows the active month's full lineup — past dates in the
+// same month stay visible until the month rolls. Bump these two when the
+// schedule moves to the next month, along with the heading further down.
+const SCHEDULE_YEAR = 2026;
+const SCHEDULE_MONTH = 6; // 0-indexed; 6 = July
+
 const all = await getCollection('events');
-const upcoming = all
-  .filter((e) => e.data.status === 'upcoming')
+const schedule = all
+  .filter(
+    (e) =>
+      e.data.date.getFullYear() === SCHEDULE_YEAR &&
+      e.data.date.getMonth() === SCHEDULE_MONTH,
+  )
   .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
 
 const fmtDateLong = (d: Date) =>
   d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit' }).toUpperCase();
@@ -25,21 +38,23 @@ const floorEmbed = ytId
 
 const events_schema = {
   '@context': 'https://schema.org',
-  '@graph': upcoming.map((e) => ({
-    '@type': 'Event',
-    name: e.data.title,
-    startDate: e.data.date.toISOString(),
-    eventStatus: 'https://schema.org/EventScheduled',
-    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-    location: {
-      '@type': 'Place',
-      name: e.data.venue,
-      address: { '@type': 'PostalAddress', addressLocality: 'Lisbon', addressCountry: 'PT' },
-    },
-    performer: e.data.lineup.map((name) => ({ '@type': 'PerformingGroup', name })),
-    organizer: { '@type': 'Organization', name: 'Carpet Club', url: 'https://www.carpetclub.pt' },
-    ...(e.data.shotgun && { offers: { '@type': 'Offer', url: e.data.shotgun, availability: 'https://schema.org/InStock' } }),
-  })),
+  '@graph': schedule
+    .filter((e) => e.data.date >= today)
+    .map((e) => ({
+      '@type': 'Event',
+      name: e.data.title,
+      startDate: e.data.date.toISOString(),
+      eventStatus: 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: {
+        '@type': 'Place',
+        name: e.data.venue,
+        address: { '@type': 'PostalAddress', addressLocality: 'Lisbon', addressCountry: 'PT' },
+      },
+      performer: e.data.lineup.map((name) => ({ '@type': 'PerformingGroup', name })),
+      organizer: { '@type': 'Organization', name: 'Carpet Club', url: 'https://www.carpetclub.pt' },
+      ...(e.data.shotgun && { offers: { '@type': 'Offer', url: e.data.shotgun, availability: 'https://schema.org/InStock' } }),
+    })),
 };
 ---
 
@@ -70,27 +85,29 @@ const events_schema = {
       </div>
     </header>
 
-    {upcoming.length > 0 && (
+    {schedule.length > 0 && (
       <div class="block">
-        <h2 class="block-title">June Schedule</h2>
+        <h2 class="block-title">July Schedule</h2>
         <div class="event-grid">
-          {upcoming.map((e) => {
+          {schedule.map((e) => {
             const isUnusualDay = e.data.date.getDay() !== 3;
+            const isPast = e.data.date < today;
             const dayName = e.data.date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
             return (
-              <article class:list={['event-card', { 'is-unusual-day': isUnusualDay }]}>
+              <article class:list={['event-card', { 'is-unusual-day': isUnusualDay, 'is-past': isPast }]}>
                 {isUnusualDay && (
                   <span class="day-badge" title="Not the usual Wednesday">
                     Heads up — {dayName}
                   </span>
                 )}
+                {isPast && <span class="past-badge">Past</span>}
                 <time datetime={e.data.date.toISOString()} class="event-date">
                   {fmtDateLong(e.data.date)}
                 </time>
                 <h3>{e.data.title}</h3>
                 <p class="lineup">{e.data.lineup.join(' · ')}</p>
                 <p class="venue">{e.data.venue}, Lisbon</p>
-                {e.data.shotgun && (
+                {e.data.shotgun && !isPast && (
                   <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
                     Tickets on Shotgun →
                   </a>
@@ -221,10 +238,32 @@ const events_schema = {
   .event-card.is-unusual-day {
     border-color: theme('colors.accent.DEFAULT');
   }
+  .event-card.is-past {
+    opacity: 0.55;
+    border-color: theme('colors.border');
+  }
+  .event-card.is-past:hover {
+    opacity: 0.8;
+    transform: none;
+  }
   .day-badge {
     display: inline-block;
     background: theme('colors.accent.DEFAULT');
     color: theme('colors.bg.DEFAULT');
+    font-family: theme('fontFamily.mono');
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+  .past-badge {
+    display: inline-block;
+    background: transparent;
+    color: theme('colors.text.muted');
+    border: 1px solid theme('colors.border');
     font-family: theme('fontFamily.mono');
     font-size: 9px;
     font-weight: 700;

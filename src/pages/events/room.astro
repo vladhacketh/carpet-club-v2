@@ -88,26 +88,28 @@ const events_schema = {
     {schedule.length > 0 && (
       <div class="block">
         <h2 class="block-title">July Schedule</h2>
-        <div class="event-grid">
+        <div class="event-grid" data-schedule-grid>
           {schedule.map((e) => {
             const isUnusualDay = e.data.date.getDay() !== 3;
-            const isPast = e.data.date < today;
             const dayName = e.data.date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
             return (
-              <article class:list={['event-card', { 'is-unusual-day': isUnusualDay, 'is-past': isPast }]}>
+              <article
+                class:list={['event-card', { 'is-unusual-day': isUnusualDay }]}
+                data-event-date={e.data.date.toISOString()}
+              >
                 {isUnusualDay && (
                   <span class="day-badge" title="Not the usual Wednesday">
                     Heads up — {dayName}
                   </span>
                 )}
-                {isPast && <span class="past-badge">Past</span>}
+                <span class="past-badge">Past</span>
                 <time datetime={e.data.date.toISOString()} class="event-date">
                   {fmtDateLong(e.data.date)}
                 </time>
                 <h3>{e.data.title}</h3>
                 <p class="lineup">{e.data.lineup.join(' · ')}</p>
                 <p class="venue">{e.data.venue}, Lisbon</p>
-                {e.data.shotgun && !isPast && (
+                {e.data.shotgun && (
                   <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
                     Tickets on Shotgun →
                   </a>
@@ -260,7 +262,7 @@ const events_schema = {
     margin-bottom: 14px;
   }
   .past-badge {
-    display: inline-block;
+    display: none;
     background: transparent;
     color: theme('colors.text.muted');
     border: 1px solid theme('colors.border');
@@ -273,6 +275,8 @@ const events_schema = {
     border-radius: 2px;
     margin-bottom: 14px;
   }
+  .event-card.is-past .past-badge { display: inline-block; }
+  .event-card.is-past .event-cta { display: none; }
   .event-date {
     font-family: theme('fontFamily.mono');
     font-size: 11px;
@@ -340,3 +344,21 @@ const events_schema = {
     .events-section { padding: 100px 24px 64px; }
   }
 </style>
+
+<script>
+  // Mark cards whose date has already passed. Runs on every visit so the
+  // live schedule always reflects the visitor's current date without a
+  // nightly redeploy — server rendering is intentionally date-agnostic.
+  (function () {
+    const grid = document.querySelector<HTMLElement>('[data-schedule-grid]');
+    if (!grid) return;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const cutoff = today.getTime();
+    grid.querySelectorAll<HTMLElement>('[data-event-date]').forEach((card) => {
+      const iso = card.dataset.eventDate;
+      if (!iso) return;
+      if (new Date(iso).getTime() < cutoff) card.classList.add('is-past');
+    });
+  })();
+</script>

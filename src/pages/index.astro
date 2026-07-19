@@ -3,16 +3,15 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import { getCollection } from 'astro:content';
 
-// Render extra cards so the client-side filter has room to trim past
-// events down to two visible ones without re-fetching data at runtime.
+// Render every event still marked `upcoming` so the client-side filter
+// always has enough non-past cards to fill the visible-limit slots.
 // The final "top 2 upcoming" trim happens in a small script at the
 // bottom of this file — this way the live schedule is always correct
-// on the visitor's date, without needing a nightly redeploy.
-const UPCOMING_RENDER = 4;
+// on the visitor's date, without needing a nightly redeploy or a
+// dance around per-event `status` flags between deploys.
 const VISIBLE_LIMIT = 2;
 const upcoming = (await getCollection('events', ({ data }) => data.status === 'upcoming'))
-  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime())
-  .slice(0, UPCOMING_RENDER);
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
 
 const fmtDate = (d: Date) =>
   d.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }).toUpperCase();

@@ -2,7 +2,7 @@
 date: 2026-07-08
 title: "Carpet Lab"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "João Couto"
   - "Phonaster"

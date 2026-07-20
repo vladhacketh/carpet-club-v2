@@ -4,7 +4,7 @@ import Marquee from '~/components/Marquee.astro';
 import MailChooser from '~/components/MailChooser.astro';
 import { site } from '~/lib/site';
 
-const BOOKING_EMAIL = 'info@carpetclub.pt';
+const BOOKING_EMAIL = site.bookingsEmail;
 
 const platforms = [
   { label: 'Instagram', handle: '@carpetclub_', url: site.social.instagram },

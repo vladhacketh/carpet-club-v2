@@ -26,7 +26,7 @@ export const site = {
   },
 
   /** Contact */
-  bookingsEmail: 'kristina.carpetevents@gmail.com',
+  bookingsEmail: 'info@carpetclub.pt',
 
   /** Social */
   social: {

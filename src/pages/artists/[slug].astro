@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import MailChooser from '~/components/MailChooser.astro';
+import { site } from '~/lib/site';
 
 export async function getStaticPaths() {
   const artists = await getCollection('artists');
@@ -36,7 +37,7 @@ const platforms: Array<{ label: string; url?: string }> = [
 ];
 const linked = platforms.filter((p) => p.url);
 
-const BOOKING_EMAIL = 'info@carpetclub.pt';
+const BOOKING_EMAIL = site.bookingsEmail;
 const bookingSubject = `Booking inquiry: ${name}`;
 const bookingBody = `Hi Carpet Club,\n\nI'd like to inquire about booking ${name}.\n\n`;
 const bookingMailto = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent(bookingSubject)}&body=${encodeURIComponent(bookingBody)}`;
@@ -128,7 +129,6 @@ const schema = {
               <iframe
                 src={ytEmbed}
                 title={`${name} — mix`}
-                frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
               ></iframe>
@@ -137,8 +137,6 @@ const schema = {
             <iframe
               width="100%"
               height="166"
-              scrolling="no"
-              frameborder="no"
               allow="autoplay"
               src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(mix)}&color=%23ff3c78&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false`}
             ></iframe>

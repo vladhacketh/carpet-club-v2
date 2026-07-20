@@ -1,5 +1,7 @@
 # Реализация · Технический отчёт
 
+> Historical architecture reference. Some implementation details have changed since this was written; use `CLAUDE.md` and the current code as the authoritative source.
+
 Документ описывает что и как реализовано в проекте Carpet Club v2 (Astro-rebuild). Цель — дать полную техническую картину, чтобы любой разработчик мог войти в код и сразу понимать решения.
 
 ---

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides working guidance for coding agents and developers in this repository.
 
 ## Commands
 
@@ -32,20 +32,17 @@ Files are loaded in filesystem order; `getCollection('artists')` listed without 
 
 ### "Upcoming" semantics (important)
 
-[src/pages/index.astro](src/pages/index.astro) and [src/pages/events/room.astro](src/pages/events/room.astro) filter to `status === 'upcoming'` **and** `date >= today` (today at 00:00, build-time). Two consequences worth knowing:
+[src/pages/index.astro](src/pages/index.astro) renders every event marked `upcoming`; a client-side date filter shows the next two non-past events on every visit. Keep `status` accurate because it controls which records are included in the built page.
 
-1. The list is **frozen at build time** — past events stay listed until a redeploy. To hide an event before its scheduled date, flip its `status` to `'past'`.
-2. Dates are compared in the build environment's timezone (Vercel = UTC), but venue copy says Lisbon. A `2026-06-24` event disappears at 01:00 Lisbon on June 25 in summer (UTC+1).
-
-The per-month block heading on /events/room (e.g. "June Schedule") is hardcoded — update manually each month.
+[src/pages/events/room.astro](src/pages/events/room.astro) selects the month containing the next dated event and derives the month heading automatically. If no future event exists, it retains the latest event month. Adding the next month's content and deploying is enough to advance the schedule.
 
 ### Tuesday badge logic
 
 Non-Wednesday events get a pink "TUESDAY"/"Heads up — TUESDAY" badge automatically via `e.data.date.getDay() !== 3` in both pages. Works for any weekday — no per-event flag needed.
 
-### Centralized site config — partly drifted
+### Centralized site config
 
-[src/lib/site.ts](src/lib/site.ts) is the intended source of truth for URLs, address, etc. **Caveat:** the booking email `info@carpetclub.pt` is hardcoded in `[slug].astro`, `contact.astro`, `events/carpet-club.astro`, and `artists/index.astro` rather than read from `site.bookingsEmail` (which still holds an outdated address). When touching email/CTA URLs, prefer fixing the import rather than perpetuating the hardcode.
+[src/lib/site.ts](src/lib/site.ts) is the source of truth for the production URL, booking email, address, and social destinations. New pages should import these values instead of duplicating them.
 
 ### Meta Pixel + Conversions API
 
@@ -82,4 +79,4 @@ GitHub `main` → Vercel auto-deploys. The `META_CAPI_ACCESS_TOKEN` and `PUBLIC_
 
 ## Project documentation in `docs/`
 
-`docs/IMPLEMENTATION.md`, `docs/CONTENT-GUIDE.md`, `docs/PRODUCTION-CHECKLIST.md` exist but were written before recent changes (May/June 2026 updates including the events restructure, MailChooser, Meta tracking). Trust the code over the docs when they conflict.
+`docs/IMPLEMENTATION.md`, `docs/CONTENT-GUIDE.md`, and `docs/PRODUCTION-CHECKLIST.md` are historical/reference documents and may lag behind current code. Trust this file and the code when they conflict.

@@ -220,7 +220,7 @@ const outlookHref = `https://outlook.office.com/mail/deeplink/compose?${outlookP
       modal!.hidden = true;
       document.body.style.overflow = prevOverflow;
       document.removeEventListener('keydown', onKey);
-      (savedReturn ?? trigger).focus();
+      (savedReturn ?? trigger)?.focus();
     }
 
     function onKey(e: KeyboardEvent) {
@@ -267,15 +267,7 @@ const outlookHref = `https://outlook.office.com/mail/deeplink/compose?${outlookP
             await navigator.clipboard.writeText(email);
             ok = true;
           } catch {
-            const ta = document.createElement('textarea');
-            ta.value = email;
-            ta.setAttribute('readonly', '');
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            try { ok = document.execCommand('copy'); } catch { ok = false; }
-            ta.remove();
+            ok = false;
           }
           const original = opt.textContent;
           opt.textContent = ok ? 'Copied!' : 'Copy failed';

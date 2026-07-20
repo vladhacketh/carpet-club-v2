@@ -2,7 +2,7 @@
 date: 2026-07-01
 title: "Carmo Rooftop"
 venue: "Carmo Rooftop"
-status: "upcoming"
+status: "past"
 lineup:
   - "Keeko"
   - "Bruno Curtis"

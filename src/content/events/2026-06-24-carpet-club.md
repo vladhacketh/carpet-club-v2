@@ -2,7 +2,7 @@
 date: 2026-06-24
 title: "Carpet Club"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Andres Zacco"
   - "Jorge Caiado"

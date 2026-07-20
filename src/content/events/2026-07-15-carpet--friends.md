@@ -2,7 +2,7 @@
 date: 2026-07-15
 title: "Carpet & Friends"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "FCO Martinez"
   - "Telma"

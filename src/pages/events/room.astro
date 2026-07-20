@@ -3,30 +3,35 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import EventsTabs from '~/components/EventsTabs.astro';
 import { getCollection } from 'astro:content';
-
-// The Room page shows the active month's full lineup — past dates in the
-// same month stay visible until the month rolls. Bump these two when the
-// schedule moves to the next month, along with the heading further down.
-const SCHEDULE_YEAR = 2026;
-const SCHEDULE_MONTH = 6; // 0-indexed; 6 = July
+import { site } from '~/lib/site';
 
 const all = await getCollection('events');
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
+// Select the month containing the next scheduled event. When there are no
+// future events, retain the latest month in the archive. Adding a new month's
+// content is therefore enough to advance this page—no code edit is required.
+const datedEvents = [...all].sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+const anchorEvent = datedEvents.find((e) => e.data.date >= today) ?? datedEvents.at(-1);
+const scheduleYear = anchorEvent?.data.date.getFullYear();
+const scheduleMonth = anchorEvent?.data.date.getMonth();
 const schedule = all
   .filter(
     (e) =>
-      e.data.date.getFullYear() === SCHEDULE_YEAR &&
-      e.data.date.getMonth() === SCHEDULE_MONTH,
+      e.data.date.getFullYear() === scheduleYear &&
+      e.data.date.getMonth() === scheduleMonth,
   )
   .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
-
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+const scheduleHeading = anchorEvent
+  ? `${anchorEvent.data.date.toLocaleDateString('en-US', { month: 'long' })} Schedule`
+  : 'Schedule';
 
 const fmtDateLong = (d: Date) =>
   d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit' }).toUpperCase();
 
-const SHOTGUN_URL = 'https://shotgun.live/en/venues/carpet-snares-records';
-const INSTAGRAM_URL = 'https://instagram.com/carpetclub_/';
+const SHOTGUN_URL = site.social.shotgun;
+const INSTAGRAM_URL = site.social.instagram;
 
 const FLOOR_VIDEO_URL = 'https://www.youtube.com/watch?v=Hn9YnK96Ji8&t=4s';
 const ytMatch = FLOOR_VIDEO_URL.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{11})/);
@@ -87,7 +92,7 @@ const events_schema = {
 
     {schedule.length > 0 && (
       <div class="block">
-        <h2 class="block-title">July Schedule</h2>
+        <h2 class="block-title">{scheduleHeading}</h2>
         <div class="event-grid" data-schedule-grid>
           {schedule.map((e) => {
             const isUnusualDay = e.data.date.getDay() !== 3;
@@ -129,7 +134,6 @@ const events_schema = {
             <iframe
               src={floorEmbed}
               title="From the Floor"
-              frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowfullscreen
             ></iframe>

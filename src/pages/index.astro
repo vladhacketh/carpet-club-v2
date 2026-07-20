@@ -2,6 +2,7 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import { getCollection } from 'astro:content';
+import { site } from '~/lib/site';
 
 // Render every event still marked `upcoming` so the client-side filter
 // always has enough non-past cards to fill the visible-limit slots.
@@ -19,11 +20,11 @@ const fmtDate = (d: Date) =>
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Carpet Club',
+  name: site.name,
   alternateName: 'Carpet & Snares',
   description: 'Lisbon-based event brand. Weekly residency and curated showcases rooted in electronic music and club culture.',
-  url: 'https://www.carpetclub.pt',
-  foundingDate: '2014',
+  url: site.url,
+  foundingDate: String(site.founded),
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Rua da Misericórdia 14, Loja 28',
@@ -32,10 +33,10 @@ const schema = {
     addressCountry: 'PT',
   },
   sameAs: [
-    'https://instagram.com/carpetclub_/',
-    'https://soundcloud.com/carpetandsnares',
-    'https://ra.co/promoters/55088',
-    'https://shotgun.live/en/venues/carpet-snares-records',
+    site.social.instagram,
+    site.social.soundcloud,
+    site.social.ra,
+    site.social.shotgun,
   ],
 };
 ---
@@ -133,8 +134,6 @@ const schema = {
       <iframe
         width="100%"
         height="166"
-        scrolling="no"
-        frameborder="no"
         allow="autoplay"
         src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/carpetandsnares/sevensolb2bhenryhodsonatroom&color=%23ff3c78&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false"
       ></iframe>

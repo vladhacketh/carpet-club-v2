@@ -31,7 +31,7 @@ const artists = await getCollection('artists');
     <p class="section-label roster-label">Roster</p>
     <div class="roster-marquee" aria-label="Resident DJs">
       <div class="roster-track">
-        {[...artists, ...artists].map((a, i) => (
+        {[...artists, ...artists].map((a) => (
           <>
             <a href={`/artists/${a.slug}`} class="roster-item">{a.data.name}</a>
             <span class="roster-sep" aria-hidden="true">•</span>

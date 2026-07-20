@@ -2,7 +2,7 @@
 
 Lisbon-based event brand — Wednesday residency at Rūmu. Static site built with Astro.
 
-> **Production URL:** _(not yet deployed — see [PRODUCTION-CHECKLIST](./docs/PRODUCTION-CHECKLIST.md))_
+> **Production URL:** https://www.carpetclub.pt
 
 ---
 

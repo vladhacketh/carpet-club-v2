@@ -2,14 +2,15 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import EventsTabs from '~/components/EventsTabs.astro';
+import { site } from '~/lib/site';
 
-const BOOKING_EMAIL = 'info@carpetclub.pt';
+const BOOKING_EMAIL = site.bookingsEmail;
 const BOOKING_MAILTO = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent('Showcase booking inquiry')}&body=${encodeURIComponent("Hi Carpet Club,\n\nI'd like to inquire about booking a Carpet Club showcase.\n\n")}`;
-const INSTAGRAM_URL = 'https://instagram.com/carpetclub_/';
+const INSTAGRAM_URL = site.social.instagram;
 
 const heroLinks = [
-  { label: 'Resident Advisor', href: 'https://ra.co/promoters/55088' },
-  { label: 'Shotgun', href: 'https://shotgun.live/en/venues/carpet-snares-records' },
+  { label: 'Resident Advisor', href: site.social.ra },
+  { label: 'Shotgun', href: site.social.shotgun },
   { label: 'Instagram', href: INSTAGRAM_URL },
 ];
 

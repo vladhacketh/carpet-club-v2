@@ -1,5 +1,7 @@
 # Production Checklist · Что нужно сделать до запуска
 
+> Historical launch checklist. The site is now deployed at https://www.carpetclub.pt on Vercel; verify current production needs against `CLAUDE.md` and the code before following these steps.
+
 Документ покрывает что осталось сделать руками, чтобы сайт работал в продакшне с настоящим доменом и реальным контентом. Каждый пункт — действие за 5-30 минут.
 
 Структура:

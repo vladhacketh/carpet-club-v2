@@ -1,5 +1,7 @@
 # Content Guide · Гайдлайны по наполнению контентом
 
+> Content concepts remain useful, but examples may lag behind the current artist and event data. Current schemas in `src/content/config.ts` are authoritative.
+
 Документ для человека, который будет регулярно обновлять сайт — добавлять события, артистов, фото. Программирования здесь нет, только редактирование текстовых файлов.
 
 ---

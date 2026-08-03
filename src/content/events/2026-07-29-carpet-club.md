@@ -2,7 +2,7 @@
 date: 2026-07-29
 title: "Carpet Club"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Saramago"
   - "Velvet Velour"

@@ -2,7 +2,7 @@
 date: 2026-09-09
 title: "Carpet & Friends"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Mike Morales"
   - "Nuno di Rosso"

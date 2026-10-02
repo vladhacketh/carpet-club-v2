@@ -2,7 +2,7 @@
 date: 2026-08-26
 title: "Carpet Club"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Bernardo Vaz"
   - "Kristina"

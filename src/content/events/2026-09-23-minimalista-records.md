@@ -2,7 +2,7 @@
 date: 2026-09-23
 title: "Minimalista Records"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "C4STRO B2B Martim Tonic"
   - "Little Freak B2B MURI"

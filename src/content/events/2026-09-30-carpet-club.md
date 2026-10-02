@@ -2,7 +2,7 @@
 date: 2026-09-30
 title: "Carpet Club"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Jorge Caiado"
   - "Boyá (Morevi Records / GE)"

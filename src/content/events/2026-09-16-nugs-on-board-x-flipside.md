@@ -2,7 +2,7 @@
 date: 2026-09-16
 title: "Nugs On Board x Flipside"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Manata"
   - "Samuel Padden"

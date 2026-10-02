@@ -2,7 +2,7 @@
 date: 2026-08-12
 title: "Carpet & Friends"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Hudson's Choice (UK)"
   - "Kulas (AO)"

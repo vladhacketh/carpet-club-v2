@@ -2,7 +2,7 @@
 date: 2026-08-05
 title: "Cut-Line Records"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Diego Knows"
   - "Pedro Goya"

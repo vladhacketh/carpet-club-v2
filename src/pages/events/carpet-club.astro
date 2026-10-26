@@ -2,7 +2,14 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import Marquee from '~/components/Marquee.astro';
 import EventsTabs from '~/components/EventsTabs.astro';
+import { getCollection } from 'astro:content';
 import { site } from '~/lib/site';
+
+const featured = (await getCollection('events', ({ data }) => data.status === 'upcoming' && data.featured))
+  .sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+
+const fmtDateLong = (d: Date) =>
+  d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit' }).toUpperCase();
 
 const BOOKING_EMAIL = site.bookingsEmail;
 const BOOKING_MAILTO = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent('Showcase booking inquiry')}&body=${encodeURIComponent("Hi Carpet Club,\n\nI'd like to inquire about booking a Carpet Club showcase.\n\n")}`;
@@ -55,11 +62,31 @@ const past: PastShowcase[] = [
 
     <div class="block">
       <h2 class="block-title">Upcoming</h2>
-      <article class="event-card tba">
-        <p class="event-date">Coming Soon</p>
-        <h3>TBA</h3>
-        <p class="lineup">Stay tuned via <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
-      </article>
+      {featured.length > 0 ? (
+        <div class="event-list">
+          {featured.map((e) => (
+            <article class="event-card is-featured">
+              <time datetime={e.data.date.toISOString()} class="event-date">
+                {fmtDateLong(e.data.date)}{e.data.hours && <> · {e.data.hours}</>}
+              </time>
+              <h3>{e.data.title}</h3>
+              <p class="lineup">{e.data.lineup.join(' · ')}</p>
+              <p class="venue">{e.data.venue}, Lisbon</p>
+              {e.data.shotgun && (
+                <a href={e.data.shotgun} target="_blank" rel="noopener noreferrer" class="event-cta">
+                  Tickets on Shotgun →
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <article class="event-card tba">
+          <p class="event-date">Coming Soon</p>
+          <h3>TBA</h3>
+          <p class="lineup">Stay tuned via <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram</a>.</p>
+        </article>
+      )}
     </div>
 
     <div class="block">
@@ -164,6 +191,30 @@ const past: PastShowcase[] = [
     max-width: 420px;
   }
   .event-card.tba { border-style: dashed; }
+  .event-card.is-featured { border-color: theme('colors.accent.DEFAULT'); }
+  .event-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 420px));
+    gap: 20px;
+  }
+  .venue {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: theme('colors.text.muted');
+    margin: 4px 0 20px;
+  }
+  .event-cta {
+    font-family: theme('fontFamily.mono');
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: theme('colors.accent.DEFAULT');
+    transition: color 0.2s;
+  }
+  .event-cta:hover { color: theme('colors.accent.hover'); }
   .event-date {
     font-family: theme('fontFamily.mono');
     font-size: 11px;

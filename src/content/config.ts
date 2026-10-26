@@ -25,6 +25,9 @@ const events = defineCollection({
     status: z.enum(['upcoming', 'past']),
     lineup: z.array(z.string()),
     shotgun: z.string().url().optional(),
+    // Featured events appear under "Upcoming" on the Showcases page.
+    featured: z.boolean().default(false),
+    hours: z.string().optional(),
   }),
 });
 

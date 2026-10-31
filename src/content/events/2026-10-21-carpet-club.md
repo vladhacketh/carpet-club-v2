@@ -2,7 +2,7 @@
 date: 2026-10-21
 title: "Carpet Club"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Fantastic Man (Aus)"
   - "Kristina"

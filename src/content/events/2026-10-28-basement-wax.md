@@ -2,7 +2,7 @@
 date: 2026-10-28
 title: "Basement Wax"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Shēz"
   - "Lopaski"

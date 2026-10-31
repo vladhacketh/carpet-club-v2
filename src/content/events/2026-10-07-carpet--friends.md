@@ -2,7 +2,7 @@
 date: 2026-10-07
 title: "Carpet & Friends"
 venue: "Rūmu"
-status: "upcoming"
+status: "past"
 lineup:
   - "Manu Oubiña (Arg)"
   - "Markov"
